@@ -7,15 +7,29 @@
   <meta name="keywords" content=" Go , 优化 ">
   <meta name="description" content="性能调优 | GoIruri">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta property="og:type" content="website">
-<meta property="og:title" content="404">
-<meta property="og:url" content="http://example.com/404/index.html">
+<meta name="description" content="Go语言内置运行时（就是runtime），抛弃了传统的内存分配方式，改为自主管理。这样可以自主地实现更好的内存使用模式，比如内存池、预分配等等。这样，不会每次内存分配都需要进行系统调用。Golang运行时的内存分配算法主要源自 Google 为 C 语言开发的TCMalloc算法，全称Thread-Caching Malloc。核心思想就是把内存分为多级管理，从而降低锁的粒度。它将可用的堆内存采用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存分配">
+<meta property="og:url" content="http://example.com/2023/03/01/%E5%9B%BE%E8%A7%A3Go%E8%AF%AD%E8%A8%80%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/index.html">
 <meta property="og:site_name" content="GoIruri">
+<meta property="og:description" content="Go语言内置运行时（就是runtime），抛弃了传统的内存分配方式，改为自主管理。这样可以自主地实现更好的内存使用模式，比如内存池、预分配等等。这样，不会每次内存分配都需要进行系统调用。Golang运行时的内存分配算法主要源自 Google 为 C 语言开发的TCMalloc算法，全称Thread-Caching Malloc。核心思想就是把内存分为多级管理，从而降低锁的粒度。它将可用的堆内存采用">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-03-01T04:12:04.000Z">
-<meta property="article:modified_time" content="2023-03-01T04:12:04.938Z">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513430081-0d876f66-89db-4af6-a211-826035408e3a.webp#averageHue=%23f4f3ec&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u51c21eb0&originHeight=188&originWidth=868&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u0fd3f634-23e6-4567-b10d-6044c98cb12&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513500919-d2e6f50c-1fdd-4d19-839a-c02fc29b1048.webp#averageHue=%23f6f2e6&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u12dd374f&originHeight=454&originWidth=2040&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u4b05113f-7fb9-4098-85ec-abecbeb28de&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513500919-1cb9f60b-5763-43c7-b535-f9415c36a641.webp#averageHue=%23f7ecc8&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u8e7fc6e2&originHeight=354&originWidth=1744&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u88f92852-6ee5-4a44-b319-0685a8a9c7f&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513891995-43e8f86c-52ea-427e-98cf-e40afbfc2ee3.webp#averageHue=%23605e59&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u6df659d6&originHeight=160&originWidth=274&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=uccb14208-3123-438a-a2c7-c7b2f110614&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514127101-ded67bd3-5bae-4551-9a67-72147922b2fa.webp#averageHue=%23f3f2f1&clientId=ua9b5a7b7-3ddd-4&from=paste&id=uef6a5408&originHeight=702&originWidth=1152&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u854ce941-0a26-4c05-9fb5-f4ef8c386b4&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514127103-6b4ab7c0-47bd-45c3-9205-d4c3a4929785.webp#averageHue=%23d0d0d0&clientId=ua9b5a7b7-3ddd-4&from=paste&id=uaf8daf78&originHeight=298&originWidth=150&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u172869c5-7113-4673-8fda-05f8bc24cdd&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514193758-235fc969-34a6-43af-9045-e594e82856a4.webp#averageHue=%23f3f3f3&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u955f222e&originHeight=630&originWidth=1330&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u523b3380-809b-4903-87a7-30644828e2a&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514260961-4c3c9cd0-872a-4cec-9362-ad1ea0c0219a.webp#averageHue=%23eeeeee&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u47fefeef&originHeight=630&originWidth=1184&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=udbb2c8a8-3512-425d-9644-b6d3bcdc9a1&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514305554-01239c04-0843-4e0d-ba78-d2221b1a2b59.webp#averageHue=%23f3f3f2&clientId=ua9b5a7b7-3ddd-4&from=paste&id=ud083a5c0&originHeight=1248&originWidth=1386&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u207c9260-1180-417f-960c-efe24901c65&title=">
+<meta property="article:published_time" content="2023-03-01T04:29:44.729Z">
+<meta property="article:modified_time" content="2023-03-01T04:29:44.761Z">
 <meta property="article:author" content="GoIruri">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="内存">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513430081-0d876f66-89db-4af6-a211-826035408e3a.webp#averageHue=%23f4f3ec&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u51c21eb0&originHeight=188&originWidth=868&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u0fd3f634-23e6-4567-b10d-6044c98cb12&title=">
 
 
 <link rel="icon" href="/img/iruri.jpg">
@@ -606,6 +620,20 @@
 
         /*高亮代码块行号*/
         
+        $('pre code').each(function(){
+            var lines = $(this).text().trim().split('\n').length, widther='';
+            if (lines>99) {
+                widther = 'widther'
+            }
+            var $numbering = $('<ul/>').addClass('pre-numbering ' + widther).attr("unselectable","on");
+            $(this).addClass('has-numbering ' + widther)
+                    .parent()
+                    .append($numbering);
+            for(var i=1;i<=lines;i++){
+                $numbering.append($('<li/>').text(i));
+            }
+        });
+        
 
         /*访问数量*/
         
@@ -625,6 +653,38 @@
 </script>
 
 <!--加入行号的高亮代码块样式-->
+
+<style>
+    pre{
+        position: relative;
+        margin-bottom: 24px;
+        border-radius: 10px;
+        border: 1px solid #e2dede;
+        background: #FFF;
+        overflow: hidden;
+    }
+    code.has-numbering{
+        margin-left: 30px;
+    }
+    code.has-numbering.widther{
+        margin-left: 35px;
+    }
+    .pre-numbering{
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        padding: 0.5em 3px 0.7em 5px;
+        border-right: 1px solid #C3CCD0;
+        text-align: right;
+        color: #AAA;
+        background-color: ;
+    }
+    .pre-numbering.widther {
+        width: 35px;
+    }
+</style>
 
 <!--自定义样式设置-->
 <style>
