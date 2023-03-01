@@ -3,9 +3,9 @@
 <meta name="referrer" content="no-referrer" />
 <head>
   <meta charset="utf-8">
-  <title>about | Hexo</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="about | Hexo">
+  <title>类型转换 | Hexo</title>
+  <meta name="keywords" content=" Go , 类型转换 ">
+  <meta name="description" content="类型转换 | Hexo">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="404">
@@ -390,24 +390,41 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+        <article id="post-类型转换" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">about</h1>
+        <h1 class="article-title">类型转换</h1>
     
     <div class="article-meta">
         
         
         
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Go">Go</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">Go</a>
+            
+            <a class="color5">类型转换</a>
+            
+        </span>
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:13:32'>2023-03-01 12:12</time>
+            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:29:54'>2023-02-18 18:14</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:7</span>
+        <span>字数:1.2k</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -426,7 +443,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E4%B8%8D%E7%9F%A5%E5%90%8D%E9%BB%91%E5%AE%A2"><span class="toc-text">一个不知名黑客</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#go%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-text">go类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%AD%E8%A8%80%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%EF%BC%88%E9%92%88%E5%AF%B9%E6%8E%A5%E5%8F%A3%EF%BC%89"><span class="toc-text">断言类型转换（针对接口）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%AD%E8%A8%80%E9%80%9A%E8%BF%87%E5%88%A4%E6%96%AD%E5%8F%98%E9%87%8F%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E8%BD%AC%E6%8D%A2%E6%88%90%E6%9F%90%E4%B8%80%E4%B8%AA%E7%B1%BB%E5%9E%8B"><span class="toc-text">断言通过判断变量是否可以转换成某一个类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8Bswitch"><span class="toc-text">类型switch</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-text">强制类型转换</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B"><span class="toc-text">强制类型转换通过修改变量类型</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-text">显式类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9A%90%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-text">隐式类型转换</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E9%97%B4%E7%9A%84%E9%87%8D%E6%96%B0%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80"><span class="toc-text">组合间的重新类型断言</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%B8%E5%90%8C%E7%B1%BB%E5%9E%8B%E9%97%B4%E8%B5%8B%E5%80%BC"><span class="toc-text">相同类型间赋值</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -442,7 +459,45 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一个不知名黑客"><a href="#一个不知名黑客" class="headerlink" title="一个不知名黑客"></a>一个不知名黑客</h3>
+        <h3 id="go类型转换"><a href="#go类型转换" class="headerlink" title="go类型转换"></a>go类型转换</h3><p>go 存在 4 种类型转换分别为：断言、强制、显式、隐式。</p>
+<p>通常说的类型转换是指断言，强制在日常不会使用到、显示是基本的类型转换、隐式使用到但是不会注意到。断言、强制、显式三类在 go 语法描述中均有说明，隐式是在日常使用过程中总结出来。</p>
+<h3 id="断言类型转换（针对接口）"><a href="#断言类型转换（针对接口）" class="headerlink" title="断言类型转换（针对接口）"></a>断言类型转换（针对接口）</h3><h5 id="断言通过判断变量是否可以转换成某一个类型"><a href="#断言通过判断变量是否可以转换成某一个类型" class="headerlink" title="断言通过判断变量是否可以转换成某一个类型"></a><strong>断言通过判断变量是否可以转换成某一个类型</strong></h5><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = x.(T)</span><br></pre></td></tr></table></figure>
+
+<p>如果 x 不是 nil，且 x 可以转换成 T 类型，就会断言成功，返回 T 类型的变量 s。如果 T 不是接口类型，则要求 x 的类型就是 T，如果 T 是一个接口，要求 x 实现了 T 接口。</p>
+<p>如果断言类型成立，则表达式返回值就是 T 类型的 x，如果断言失败就会触发 panic。</p>
+<p>上述表所示再断言失败就会 panic，go 提供了另外一种带返回是否成立的断言语法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s, ok := x.(T)</span><br></pre></td></tr></table></figure>
+
+<p>该方法和第一种差不多一样，但是 ok 会返回是否断言成功不会出现 panic，ok 就表示是否是成功了。</p>
+<h5 id="类型switch"><a href="#类型switch" class="headerlink" title="类型switch"></a>类型switch</h5><p>go语法还提供了一种类型switch的断言方法。</p>
+<p>x 断言成了 type 类型，type 类型具体值就是 switch case 的值，如果 x 成功断言成了某个 case 类型，就可以执行那个 case，此时 <code>i := x.(type)</code> 返回的 i 就是那个类型的变量了，可以直接当作 case 类型使用。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> i := x.(<span class="keyword">type</span>) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="literal">nil</span>:</span><br><span class="line">    printString(<span class="string">&quot;x is nil&quot;</span>)                <span class="comment">// type of i is type of x (interface&#123;&#125;)</span></span><br><span class="line"><span class="keyword">case</span> <span class="type">int</span>:</span><br><span class="line">    printInt(i)                            <span class="comment">// type of i is int</span></span><br><span class="line"><span class="keyword">case</span> <span class="type">float64</span>:</span><br><span class="line">    printFloat64(i)                        <span class="comment">// type of i is float64</span></span><br><span class="line"><span class="keyword">case</span> <span class="function"><span class="keyword">func</span><span class="params">(<span class="type">int</span>)</span></span> <span class="type">float64</span>:</span><br><span class="line">    printFunction(i)                       <span class="comment">// type of i is func(int) float64</span></span><br><span class="line"><span class="keyword">case</span> <span class="type">bool</span>, <span class="type">string</span>:</span><br><span class="line">    printString(<span class="string">&quot;type is bool or string&quot;</span>)  <span class="comment">// type of i is type of x (interface&#123;&#125;)</span></span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    printString(<span class="string">&quot;don&#x27;t know the type&quot;</span>)     <span class="comment">// type of i is type of x (interface&#123;&#125;)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="强制类型转换"><a href="#强制类型转换" class="headerlink" title="强制类型转换"></a>强制类型转换</h3><h5 id="强制类型转换通过修改变量类型"><a href="#强制类型转换通过修改变量类型" class="headerlink" title="强制类型转换通过修改变量类型"></a><strong>强制类型转换通过修改变量类型</strong></h5><p>该方法不常见，主要用于 unsafe 包和接口类型检测，需要懂得 go 变量的知识。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f <span class="type">float64</span></span><br><span class="line">bits = *(*<span class="type">uint64</span>)(unsafe.Pointer(&amp;f))</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ptr unsafe.Pointer</span><br><span class="line">bits = *(*<span class="type">uint64</span>)(ptr(&amp;f))</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p ptr = <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+
+<p>float64 就强制转换成 uint64 类型，float 的地址就是一个值但是类型是 float64，然后创建了一个 uint64 类型变量，地址值也是 float64 的地址值，两个变量值相同类型不同，强制转换了类型。</p>
+<p>unsafe 强制转换是指针的底层操作了，用 c 的朋友就很熟悉这样的指针类型转换，利用内存对齐才能保证转换可靠，例如 int 和 uint 存在符号位差别，利用 unsafe 转换后值可能不同，但是在内存存储二进制一模一样。</p>
+<h3 id="显式类型转换"><a href="#显式类型转换" class="headerlink" title="显式类型转换"></a>显式类型转换</h3><p>一个显式转换的表达式 T (x) ，其中 T 是一种类型并且 x 是可转换为类型的表达式 T，例如：<code>uint(666)</code>。</p>
+<ul>
+<li>x 可以分配成 T 类型。</li>
+<li>忽略 struct 标签 x 的类型和 T 具有相同的基础类型。</li>
+<li>忽略 struct 标记 x 的类型和 T 是未定义类型的指针类型，并且它们的指针基类型具有相同的基础类型。</li>
+<li>x 的类型和 T 都是整数或浮点类型。</li>
+<li>x 的类型和 T 都是复数类型。</li>
+<li>x 的类型是整数或 [] byte 或 [] rune，并且 T 是字符串类型。</li>
+<li>x 的类型是字符串，T 类型是 [] byte 或 [] rune。</li>
+</ul>
+<h3 id="隐式类型转换"><a href="#隐式类型转换" class="headerlink" title="隐式类型转换"></a>隐式类型转换</h3><p><strong>隐式类型转换日常使用并不会感觉到，但是运行中确实出现了类型转换，以下列出了两种。</strong></p>
+<h5 id="组合间的重新类型断言"><a href="#组合间的重新类型断言" class="headerlink" title="组合间的重新类型断言"></a>组合间的重新类型断言</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Reader <span class="keyword">interface</span> &#123;</span><br><span class="line">    Read(p []<span class="type">byte</span>) (n <span class="type">int</span>, err <span class="type">error</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> ReadCloser <span class="keyword">interface</span> &#123;</span><br><span class="line">    Reader</span><br><span class="line">    Close() <span class="type">error</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> rc ReaderClose</span><br><span class="line">r := rc</span><br></pre></td></tr></table></figure>
+
+<p>ReaderClose 接口组合了 Reader 接口，但是 r&#x3D;rc 的赋值时还是类型转换了，go 使用系统内置的函数执行了类型转换。以前遇到过类似接口组合类型的变量赋值，然后使用 pprof 和 bench 测试发现了这一细节，在接口类型转移时浪费了一些性能。</p>
+<h5 id="相同类型间赋值"><a href="#相同类型间赋值" class="headerlink" title="相同类型间赋值"></a>相同类型间赋值</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Handler <span class="function"><span class="keyword">func</span><span class="params">()</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewHandler</span><span class="params">()</span></span> Handler &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>虽然 type 定义了 Handler 类型，但是 Handler 和 func () 是两种实际类型，类型不会相等，<strong>使用反射和断言均会出现两种类型不同</strong>。</p>
+<p>两种类型不同验证代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;reflect&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Handler <span class="function"><span class="keyword">func</span><span class="params">()</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">a</span><span class="params">()</span></span> Handler &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> i <span class="keyword">interface</span>&#123;&#125; = main</span><br><span class="line">    _, ok := i.(<span class="function"><span class="keyword">func</span><span class="params">()</span></span>)</span><br><span class="line">    fmt.Println(ok)</span><br><span class="line">    _, ok = i.(Handler)</span><br><span class="line">    fmt.Println(ok)</span><br><span class="line">    fmt.Println(reflect.TypeOf(main) == reflect.TypeOf((*Handler)(<span class="literal">nil</span>)).Elem())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// true</span></span><br><span class="line"><span class="comment">// false</span></span><br><span class="line"><span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
     </div>

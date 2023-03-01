@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html>
+<meta name="referrer" content="no-referrer" />
+<head>
+  <meta charset="utf-8">
+  <title>内存分配 | Hexo</title>
+  <meta name="keywords" content=" Go , 内存 ">
+  <meta name="description" content="内存分配 | Hexo">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="404">
+<meta property="og:url" content="http://example.com/404/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-03-01T04:12:04.000Z">
+<meta property="article:modified_time" content="2023-03-01T04:12:04.938Z">
+<meta property="article:author" content="GoIruri">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="icon" href="/img/iruri.jpg">
+
+<link href="/css/style.css?v=1.1.0" rel="stylesheet">
+
+<link href="/css/hl_theme/darcula.css?v=1.1.0" rel="stylesheet">
+
+<link href="//cdn.jsdelivr.net/npm/animate.css@4.1.0/animate.min.css" rel="stylesheet">
+
+<script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="/js/titleTip.js?v=1.1.0" ></script>
+
+<script src="//cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
+<script>
+    hljs.initHighlightingOnLoad();
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+
+
+<script src="//cdn.jsdelivr.net/npm/jquery.cookie@1.4.1/jquery.cookie.min.js" ></script>
+
+<script src="/js/iconfont.js?v=1.1.0" ></script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<div style="display: none">
+  <input class="theme_disqus_on" value="false">
+  <input class="theme_preload_comment" value="">
+  <input class="theme_blog_path" value="">
+  <input id="theme_shortcut" value="true" />
+  <input id="theme_highlight_on" value="true" />
+  <input id="theme_code_copy" value="true" />
+</div>
+
+
+
+<body>
+<aside class="nav">
+    <div class="nav-left">
+        <a href="/"
+   class="avatar_target">
+    <img class="avatar"
+         src="/img/iruri.jpg"/>
+</a>
+<div class="author">
+    <span>GoIruri</span>
+</div>
+
+<div class="icon">
+    
+        
+            <a title="github"
+               href="https://github.com/GoIruri"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
+                
+            </a>
+        
+    
+        
+            <a title="email"
+               href="mailto:1174511382@qq.com"
+               target="_blank">
+                
+                    <svg class="iconfont-svg" aria-hidden="true">
+                        <use xlink:href="#icon-email"></use>
+                    </svg>
+                
+            </a>
+        
+    
+</div>
+
+
+
+
+<ul>
+    <li>
+        <div class="all active" data-rel="全部文章">全部文章
+            
+                <small>(7)</small>
+            
+        </div>
+    </li>
+    
+        
+            
+        
+    
+        
+            
+        
+    
+        
+            
+        
+    
+        
+            
+        
+    
+        
+            
+        
+    
+        
+            
+                <li>
+                    <div data-rel="Go">
+                        <i class="fold iconfont icon-right"></i>
+                        
+                        Go
+                        <small>(7)</small>
+                        
+                    </div>
+                    
+                        <ul class="sub hide">
+                            
+                                <li>
+                                    <div data-rel="Go<--->编译">
+                                        
+                                        编译
+                                        
+                                            <small>(1
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                                <li>
+                                    <div data-rel="Go<--->并发">
+                                        
+                                        并发
+                                        
+                                            <small>(1
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                                <li>
+                                    <div data-rel="Go<--->内存">
+                                        
+                                        内存
+                                        
+                                            <small>(2
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                                <li>
+                                    <div data-rel="Go<--->设计模式">
+                                        
+                                        设计模式
+                                        
+                                            <small>(1
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                                <li>
+                                    <div data-rel="Go<--->优化">
+                                        
+                                        优化
+                                        
+                                            <small>(1
+                                                )</small>
+                                        
+                                    </div>
+                                    
+                                </li>
+                            
+                        </ul>
+                    
+                </li>
+            
+        
+    
+</ul>
+<div class="left-bottom">
+    <div class="menus">
+        
+            
+            
+            
+    </div>
+    <div>
+        
+            <a class="about  site_url"
+               
+               href="/about">关于</a>
+        
+        
+    </div>
+</div>
+<input type="hidden" id="yelog_site_posts_number" value="7">
+<input type="hidden" id="yelog_site_word_count" value="9.9k">
+<div style="display: none">
+    <span id="busuanzi_value_site_uv"></span>
+    <span id="busuanzi_value_site_pv"></span>
+</div>
+
+    </div>
+    <div class="nav-right">
+        <div class="friends-area">
+    <div class="friends-title">
+        友情链接
+        <i class="iconfont icon-left"></i>
+    </div>
+    <div class="friends-content">
+        <ul>
+            
+        </ul>
+    </div>
+</div>
+        <div class="title-list">
+    <div class="right-top">
+        <div id="default-panel">
+            <i class="iconfont icon-search" data-title="搜索 快捷键 i"></i>
+            <div class="right-title">全部文章</div>
+            <i class="iconfont icon-file-tree" data-title="切换到大纲视图 快捷键 w"></i>
+        </div>
+        <div id="search-panel">
+            <i class="iconfont icon-left" data-title="返回"></i>
+            <input id="local-search-input" autocomplete="off"/>
+            <label class="border-line" for="input"></label>
+            <i class="iconfont icon-case-sensitive" data-title="大小写敏感"></i>
+            <i class="iconfont icon-tag" data-title="标签"></i>
+        </div>
+        <div id="outline-panel" style="display: none">
+            <div class="right-title">大纲</div>
+            <i class="iconfont icon-list" data-title="切换到文章列表"></i>
+        </div>
+    </div>
+
+    <div class="tags-list">
+    <input id="tag-search" />
+    <div class="tag-wrapper">
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>编译</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>并发</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>类型转换</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>内存</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>内存管理</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>设计模式</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>优化</a>
+            </li>
+        
+            <li class="article-tag-list-item">
+                <i class="iconfont icon-tag"></i><a>Go</a>
+            </li>
+        
+    </div>
+
+</div>
+
+    
+    <div id="local-search-result">
+
+    </div>
+    
+    <nav id="title-list-nav">
+        
+        
+        <a  class="全部文章 Go 内存 "
+           href="/2023/03/01/%E5%9B%BE%E8%A7%A3Go%E8%AF%AD%E8%A8%80%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/"
+           data-tag="Go,内存"
+           data-author="" >
+            <span class="post-title" title="内存分配">内存分配</span>
+            <span class="post-date" title="2023-03-01 12:29:44">2023/03/01</span>
+        </a>
+        
+        
+        <a  class="全部文章 Go 优化 "
+           href="/2023/03/01/%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98/"
+           data-tag="Go,优化"
+           data-author="" >
+            <span class="post-title" title="性能调优">性能调优</span>
+            <span class="post-date" title="2023-03-01 12:29:34">2023/03/01</span>
+        </a>
+        
+        
+        <a  class="全部文章 Go 内存 "
+           href="/2023/03/01/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"
+           data-tag="Go,内存管理"
+           data-author="" >
+            <span class="post-title" title=""></span>
+            <span class="post-date" title="2023-03-01 12:29:25">2023/03/01</span>
+        </a>
+        
+        
+        <a  class="全部文章 Go 编译 "
+           href="/2023/03/01/%E7%BC%96%E8%AF%91%E5%99%A8%E4%BC%98%E5%8C%96/"
+           data-tag="Go,编译"
+           data-author="" >
+            <span class="post-title" title="编译">编译</span>
+            <span class="post-date" title="2023-03-01 12:29:15">2023/03/01</span>
+        </a>
+        
+        
+        <a  class="全部文章 Go 并发 "
+           href="/2023/03/01/channel/"
+           data-tag="Go,并发"
+           data-author="" >
+            <span class="post-title" title="channel">channel</span>
+            <span class="post-date" title="2023-03-01 12:28:58">2023/03/01</span>
+        </a>
+        
+        
+        <a  class="全部文章 Go 设计模式 "
+           href="/2023/02/24/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/"
+           data-tag="Go,设计模式"
+           data-author="" >
+            <span class="post-title" title="面向对象设计原则">面向对象设计原则</span>
+            <span class="post-date" title="2023-02-24 09:56:47">2023/02/24</span>
+        </a>
+        
+        
+        <a  class="全部文章 Go "
+           href="/2023/02/18/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/"
+           data-tag="Go,类型转换"
+           data-author="" >
+            <span class="post-title" title="类型转换">类型转换</span>
+            <span class="post-date" title="2023-02-18 18:14:25">2023/02/18</span>
+        </a>
+        
+        <div id="no-item-tips">
+
+        </div>
+    </nav>
+    <div id="outline-list">
+    </div>
+</div>
+
+    </div>
+    <div class="hide-list">
+        <div class="semicircle" data-title="切换全屏 快捷键 s">
+            <div class="brackets first"><</div>
+            <div class="brackets">&gt;</div>
+        </div>
+    </div>
+</aside>
+<div id="post">
+    <div class="pjax">
+        <article id="post-图解Go语言内存分配" class="article article-type-post" itemscope itemprop="blogPost">
+    
+        <h1 class="article-title">内存分配</h1>
+    
+    <div class="article-meta">
+        
+        
+        
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Go">Go</a> > 
+            
+            <a  data-rel="Go&lt;---&gt;内存">内存</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">Go</a>
+            
+            <a class="color3">内存</a>
+            
+        </span>
+        
+    </div>
+    <div class="article-meta">
+        
+            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:29:44'>2023-03-01 12:29</time>
+        
+    </div>
+    <div class="article-meta">
+        
+        <span>字数:3.2k</span>
+        
+        
+        <span id="busuanzi_container_page_pv">
+            阅读 :<span id="busuanzi_value_page_pv">
+                <span class="count-comment">
+                    <span class="spinner">
+                      <div class="cube1"></div>
+                      <div class="cube2"></div>
+                    </span>
+                </span>
+            </span>
+        </span>
+        
+        
+    </div>
+    
+    <div class="toc-ref">
+    
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-text">基础概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8D%95%E5%85%83"><span class="toc-text">内存管理单元</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E7%BB%84%E4%BB%B6"><span class="toc-text">内存管理组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mcache"><span class="toc-text">mcache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mcentral"><span class="toc-text">mcentral</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mheap"><span class="toc-text">mheap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E9%85%8D%E6%B5%81%E7%A8%8B"><span class="toc-text">分配流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+    
+<style>
+    .left-col .switch-btn,
+    .left-col .switch-area {
+        display: none;
+    }
+    .toc-level-3 i,
+    .toc-level-3 ol {
+        display: none !important;
+    }
+</style>
+</div>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Go语言内置运行时（就是runtime），抛弃了传统的内存分配方式，改为自主管理。这样可以自主地实现更好的内存使用模式，比如内存池、预分配等等。这样，不会每次内存分配都需要进行系统调用。<br>Golang运行时的内存分配算法主要源自 Google 为 C 语言开发的TCMalloc算法，全称Thread-Caching Malloc。核心思想就是把内存分为多级管理，从而降低锁的粒度。它将可用的堆内存采用二级分配的方式进行管理：每个线程都会自行维护一个独立的内存池，进行内存分配时优先从该内存池中分配，当内存池不足时才会向全局内存池申请，以避免不同线程对全局内存池的频繁竞争。</p>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>Go在程序启动的时候，会先向操作系统申请一块内存（注意这时还只是一段虚拟的地址空间，并不会真正地分配内存），切成小块后自己进行管理。<br>申请到的内存块被分配了三个区域，在X64上分别是512MB，16GB，512GB大小。<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513430081-0d876f66-89db-4af6-a211-826035408e3a.webp#averageHue=%23f4f3ec&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u51c21eb0&originHeight=188&originWidth=868&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u0fd3f634-23e6-4567-b10d-6044c98cb12&title="><br>arena区域就是我们所谓的堆区，Go动态分配的内存都是在这个区域，它把内存分割成8KB大小的页，一些页组合起来称为mspan。<br>bitmap区域标识arena区域哪些地址保存了对象，并且用4bit标志位表示对象是否包含指针、GC标记信息。bitmap中一个byte大小的内存对应arena区域中4个指针大小（指针大小为 8B ）的内存，所以bitmap区域的大小是512GB&#x2F;(4<em>8B)&#x3D;16GB。<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513500919-d2e6f50c-1fdd-4d19-839a-c02fc29b1048.webp#averageHue=%23f6f2e6&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u12dd374f&originHeight=454&originWidth=2040&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u4b05113f-7fb9-4098-85ec-abecbeb28de&title="><br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513500919-1cb9f60b-5763-43c7-b535-f9415c36a641.webp#averageHue=%23f7ecc8&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u8e7fc6e2&originHeight=354&originWidth=1744&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u88f92852-6ee5-4a44-b319-0685a8a9c7f&title="><br>从上图其实还可以看到bitmap的高地址部分指向arena区域的低地址部分，也就是说bitmap的地址是由高地址向低地址增长的。<br>spans区域存放mspan（也就是一些arena分割的页组合起来的内存管理基本单元，后文会再讲）的指针，每个指针对应一页，所以spans区域的大小就是512GB&#x2F;8KB</em>8B&#x3D;512MB。除以8KB是计算arena区域的页数，而最后乘以8是计算spans区域所有指针的大小。创建mspan的时候，按页填充对应的spans区域，在回收object时，根据地址很容易就能找到它所属的mspan。</p>
+<h3 id="内存管理单元"><a href="#内存管理单元" class="headerlink" title="内存管理单元"></a>内存管理单元</h3><p>mspan：Go中内存管理的基本单元，是由一片连续的8KB的页组成的大块内存。注意，这里的页和操作系统本身的页并不是一回事，它一般是操作系统页大小的几倍。一句话概括：mspan是一个包含起始地址、mspan规格、页的数量等内容的双端链表。<br>每个mspan按照它自身的属性Size Class的大小分割成若干个object，每个object可存储一个对象。并且会使用一个位图来标记其尚未使用的object。属性Size Class决定object大小，而mspan只会分配给和object尺寸大小接近的对象，当然，对象的大小要小于object大小。还有一个概念：Span Class，它和Size Class的含义差不多，</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Size_Class = Span_Class / <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>这是因为其实每个 Size Class有两个mspan，也就是有两个Span Class。其中一个分配给含有指针的对象，另一个分配给不含有指针的对象。这会给垃圾回收机制带来利好，之后的文章再谈。<br>如下图，mspan由一组连续的页组成，按照一定大小划分成object。<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676513891995-43e8f86c-52ea-427e-98cf-e40afbfc2ee3.webp#averageHue=%23605e59&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u6df659d6&originHeight=160&originWidth=274&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=uccb14208-3123-438a-a2c7-c7b2f110614&title="><br>Go1.9.2里mspan的Size Class共有67种，每种mspan分割的object大小是8*2n的倍数，这个是写死在代码里的：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// path: /usr/local/go/src/runtime/sizeclasses.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> _NumSizeClasses = <span class="number">67</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> class_to_size = [_NumSizeClasses]<span class="type">uint16</span>&#123;<span class="number">0</span>, <span class="number">8</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">48</span>, <span class="number">64</span>, <span class="number">80</span>, <span class="number">96</span>, <span class="number">112</span>, <span class="number">128</span>, <span class="number">144</span>, <span class="number">160</span>, <span class="number">176</span>, <span class="number">192</span>, <span class="number">208</span>, <span class="number">224</span>, <span class="number">240</span>, <span class="number">256</span>, <span class="number">288</span>, <span class="number">320</span>, <span class="number">352</span>, <span class="number">384</span>, <span class="number">416</span>, <span class="number">448</span>, <span class="number">480</span>, <span class="number">512</span>, <span class="number">576</span>, <span class="number">640</span>, <span class="number">704</span>, <span class="number">768</span>, <span class="number">896</span>, <span class="number">1024</span>, <span class="number">1152</span>, <span class="number">1280</span>, <span class="number">1408</span>, <span class="number">1536</span>,<span class="number">1792</span>, <span class="number">2048</span>, <span class="number">2304</span>, <span class="number">2688</span>, <span class="number">3072</span>, <span class="number">3200</span>, <span class="number">3456</span>, <span class="number">4096</span>, <span class="number">4864</span>, <span class="number">5376</span>, <span class="number">6144</span>, <span class="number">6528</span>, <span class="number">6784</span>, <span class="number">6912</span>, <span class="number">8192</span>, <span class="number">9472</span>, <span class="number">9728</span>, <span class="number">10240</span>, <span class="number">10880</span>, <span class="number">12288</span>, <span class="number">13568</span>, <span class="number">14336</span>, <span class="number">16384</span>, <span class="number">18432</span>, <span class="number">19072</span>, <span class="number">20480</span>, <span class="number">21760</span>, <span class="number">24576</span>, <span class="number">27264</span>, <span class="number">28672</span>, <span class="number">32768</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>根据mspan的Size Class可以得到它划分的object大小。 比如Size Class等于3，object大小就是32B。 32B大小的object可以存储对象大小范围在17B~32B的对象。而对于微小对象（小于16B），分配器会将其进行合并，将几个对象分配到同一个object中。<br>数组里最大的数是32768，也就是32KB，超过此大小就是大对象了，它会被特别对待，这个稍后会再介绍。顺便提一句，类型Size Class为0表示大对象，它实际上直接由堆内存分配，而小对象都要通过mspan来分配。<br>对于mspan来说，它的Size Class会决定它所能分到的页数，这也是写死在代码里的：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// path: /usr/local/go/src/runtime/sizeclasses.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> _NumSizeClasses = <span class="number">67</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> class_to_allocnpages = [_NumSizeClasses]<span class="type">uint8</span>&#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">2</span>, <span class="number">9</span>, <span class="number">7</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="number">7</span>, <span class="number">4</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>比如当我们要申请一个object大小为32B的mspan的时候，在class_to_size里对应的索引是3，而索引3在class_to_allocnpages数组里对应的页数就是1。<br>mspan结构体定义：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// path: /usr/local/go/src/runtime/mheap.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> mspan <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="comment">//链表前向指针，用于将span链接起来</span></span><br><span class="line">	next *mspan	</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//链表前向指针，用于将span链接起来</span></span><br><span class="line">	prev *mspan	</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 起始地址，也即所管理页的地址</span></span><br><span class="line">	startAddr <span class="type">uintptr</span> </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 管理的页数</span></span><br><span class="line">	npages <span class="type">uintptr</span> </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 块个数，表示有多少个块可供分配</span></span><br><span class="line">	nelems <span class="type">uintptr</span> </span><br><span class="line"></span><br><span class="line">    <span class="comment">//分配位图，每一位代表一个块是否已分配</span></span><br><span class="line">	allocBits *gcBits </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 已分配块的个数</span></span><br><span class="line">	allocCount <span class="type">uint16</span> </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// class表中的class ID，和Size Classs相关</span></span><br><span class="line">	spanclass spanClass  </span><br><span class="line"></span><br><span class="line">    <span class="comment">// class表中的对象大小，也即块大小</span></span><br><span class="line">	elemsize <span class="type">uintptr</span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们将mspan放到更大的视角来看：<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514127101-ded67bd3-5bae-4551-9a67-72147922b2fa.webp#averageHue=%23f3f2f1&clientId=ua9b5a7b7-3ddd-4&from=paste&id=uef6a5408&originHeight=702&originWidth=1152&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u854ce941-0a26-4c05-9fb5-f4ef8c386b4&title="><br>上图可以看到有两个S指向了同一个mspan，因为这两个S指向的P是同属一个mspan的。所以，通过arena上的地址可以快速找到指向它的S，通过S就能找到mspan，回忆一下前面我们说的mspan区域的每个指针对应一页。<br>假设最左边第一个mspan的Size Class等于10，根据前面的class_to_size数组，得出这个msapn分割的object大小是144B，算出可分配的对象个数是8KB&#x2F;144B&#x3D;56.89个，取整56个，所以会有一些内存浪费掉了，Go的源码里有所有Size Class的mspan浪费的内存的大小；再根据class_to_allocnpages数组，得到这个mspan只由1个page组成；假设这个mspan是分配给无指针对象的，那么spanClass等于20。<br>startAddr直接指向arena区域的某个位置，表示这个mspan的起始地址，allocBits指向一个位图，每位代表一个块是否被分配了对象；allocCount则表示总共已分配的对象个数。<br>这样，左起第一个mspan的各个字段参数就如下图所示：<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514127103-6b4ab7c0-47bd-45c3-9205-d4c3a4929785.webp#averageHue=%23d0d0d0&clientId=ua9b5a7b7-3ddd-4&from=paste&id=uaf8daf78&originHeight=298&originWidth=150&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u172869c5-7113-4673-8fda-05f8bc24cdd&title="></p>
+<h3 id="内存管理组件"><a href="#内存管理组件" class="headerlink" title="内存管理组件"></a>内存管理组件</h3><p>内存分配由内存分配器完成。分配器由3种组件构成：mcache, mcentral, mheap。</p>
+<h3 id="mcache"><a href="#mcache" class="headerlink" title="mcache"></a>mcache</h3><p>mcache：每个工作线程都会绑定一个mcache，本地缓存可用的mspan资源，这样就可以直接给Goroutine分配，因为不存在多个Goroutine竞争的情况，所以不会消耗锁资源。<br>mcache的结构体定义：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//path: /usr/local/go/src/runtime/mcache.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> mcache <span class="keyword">struct</span> &#123;</span><br><span class="line">    alloc [numSpanClasses]*mspan</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">numSpanClasses = _NumSizeClasses &lt;&lt; <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>mcache用Span Classes作为索引管理多个用于分配的mspan，它包含所有规格的mspan。它是_NumSizeClasses的2倍，也就是67*2&#x3D;134，为什么有一个两倍的关系，前面我们提到过：为了加速之后内存回收的速度，数组里一半的mspan中分配的对象不包含指针，另一半则包含指针。<br>对于无指针对象的mspan在进行垃圾回收的时候无需进一步扫描它是否引用了其他活跃的对象。 后面的垃圾回收文章会再讲到，这次先到这里。<br><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514193758-235fc969-34a6-43af-9045-e594e82856a4.webp#averageHue=%23f3f3f3&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u955f222e&originHeight=630&originWidth=1330&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u523b3380-809b-4903-87a7-30644828e2a&title="><br>mcache在初始化的时候是没有任何mspan资源的，在使用过程中会动态地从mcentral申请，之后会缓存下来。当对象小于等于32KB大小时，使用mcache的相应规格的mspan进行分配。</p>
+<h3 id="mcentral"><a href="#mcentral" class="headerlink" title="mcentral"></a>mcentral</h3><p>mcentral：为所有mcache提供切分好的mspan资源。每个central保存一种特定大小的全局mspan列表，包括已分配出去的和未分配出去的。 每个mcentral对应一种mspan，而mspan的种类导致它分割的object大小不同。当工作线程的mcache中没有合适（也就是特定大小的）的mspan时就会从mcentral获取。<br>mcentral被所有的工作线程共同享有，存在多个Goroutine竞争的情况，因此会消耗锁资源。结构体定义：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//path: /usr/local/go/src/runtime/mcentral.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> mcentral <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="comment">// 互斥锁</span></span><br><span class="line">    lock mutex </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 规格</span></span><br><span class="line">    sizeclass <span class="type">int32</span> </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 尚有空闲object的mspan链表</span></span><br><span class="line">    nonempty mSpanList </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 没有空闲object的mspan链表，或者是已被mcache取走的msapn链表</span></span><br><span class="line">    empty mSpanList </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 已累计分配的对象个数</span></span><br><span class="line">    nmalloc <span class="type">uint64</span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514260961-4c3c9cd0-872a-4cec-9362-ad1ea0c0219a.webp#averageHue=%23eeeeee&clientId=ua9b5a7b7-3ddd-4&from=paste&id=u47fefeef&originHeight=630&originWidth=1184&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=udbb2c8a8-3512-425d-9644-b6d3bcdc9a1&title="><br>empty表示这条链表里的mspan都被分配了object，或者是已经被cache取走了的mspan，这个mspan就被那个工作线程独占了。而nonempty则表示有空闲对象的mspan列表。每个central结构体都在mheap中维护。<br>简单说下mcache从mcentral获取和归还mspan的流程：</p>
+<ul>
+<li>获取 加锁；从nonempty链表找到一个可用的mspan；并将其从nonempty链表删除；将取出的mspan加入到empty链表；将mspan返回给工作线程；解锁。</li>
+<li>归还 加锁；将mspan从empty链表删除；将mspan加入到nonempty链表；解锁。</li>
+</ul>
+<h3 id="mheap"><a href="#mheap" class="headerlink" title="mheap"></a>mheap</h3><p>mheap：代表Go程序持有的所有堆空间，Go程序使用一个mheap的全局对象_mheap来管理堆内存。<br>当mcentral没有空闲的mspan时，会向mheap申请。而mheap没有资源时，会向操作系统申请新内存。mheap主要用于大对象的内存分配，以及管理未切割的mspan，用于给mcentral切割成小对象。<br>同时我们也看到，mheap中含有所有规格的mcentral，所以，当一个mcache从mcentral申请mspan时，只需要在独立的mcentral中使用锁，并不会影响申请其他规格的mspan。<br>mheap结构体定义：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//path: /usr/local/go/src/runtime/mheap.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> mheap <span class="keyword">struct</span> &#123;</span><br><span class="line">	lock mutex</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// spans: 指向mspans区域，用于映射mspan和page的关系</span></span><br><span class="line">	spans []*mspan </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 指向bitmap首地址，bitmap是从高地址向低地址增长的</span></span><br><span class="line">	bitmap <span class="type">uintptr</span> </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指示arena区首地址</span></span><br><span class="line">	arena_start <span class="type">uintptr</span> </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 指示arena区已使用地址位置</span></span><br><span class="line">	arena_used  <span class="type">uintptr</span> </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 指示arena区末地址</span></span><br><span class="line">	arena_end   <span class="type">uintptr</span> </span><br><span class="line"></span><br><span class="line">	central [<span class="number">67</span>*<span class="number">2</span>]<span class="keyword">struct</span> &#123;</span><br><span class="line">		mcentral mcentral</span><br><span class="line">		pad [sys.CacheLineSize - unsafe.Sizeof(mcentral&#123;&#125;)%sys.CacheLineSize]<span class="type">byte</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/webp/29334239/1676514305554-01239c04-0843-4e0d-ba78-d2221b1a2b59.webp#averageHue=%23f3f3f2&clientId=ua9b5a7b7-3ddd-4&from=paste&id=ud083a5c0&originHeight=1248&originWidth=1386&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u207c9260-1180-417f-960c-efe24901c65&title="><br>上图我们看到，bitmap和arena_start指向了同一个地址，这是因为bitmap的地址是从高到低增长的，所以他们指向的内存位置相同。</p>
+<h3 id="分配流程"><a href="#分配流程" class="headerlink" title="分配流程"></a>分配流程</h3><p>变量是在栈上分配还是在堆上分配，是由逃逸分析的结果决定的。通常情况下，编译器是倾向于将变量分配到栈上的，因为它的开销小，最极端的就是”zero garbage”，所有的变量都会在栈上分配，这样就不会存在内存碎片，垃圾回收之类的东西。<br>Go的内存分配器在分配对象时，根据对象的大小，分成三类：小对象（小于等于16B）、一般对象（大于16B，小于等于32KB）、大对象（大于32KB）。<br>大体上的分配流程：</p>
+<ul>
+<li>32KB 的对象，直接从mheap上分配；</li>
+<li>&lt;&#x3D;16B 的对象使用mcache的tiny分配器分配；</li>
+<li>(16B,32KB] 的对象，首先计算对象的规格大小，然后使用mcache中相应规格大小的mspan分配；</li>
+<li>如果mcache没有相应规格大小的mspan，则向mcentral申请</li>
+<li>如果mcentral没有相应规格大小的mspan，则向mheap申请</li>
+<li>如果mheap中也没有合适大小的mspan，则向操作系统申请</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Go语言的内存分配非常复杂，它的一个原则就是能复用的一定要复用。</p>
+<ul>
+<li>Go在程序启动时，会向操作系统申请一大块内存，之后自行管理。</li>
+<li>Go内存管理的基本单元是mspan，它由若干个页组成，每种mspan可以分配特定大小的object。</li>
+<li>mcache, mcentral, mheap是Go内存管理的三大组件，层层递进。mcache管理线程在本地缓存的mspan；mcentral管理全局的mspan供所有线程使用；mheap管理Go的所有动态分配内存。</li>
+<li>极小对象会分配在一个object中，以节省资源，使用tiny分配器分配内存；一般小对象通过mspan分配内存；大对象则直接由mheap分配内存。</li>
+</ul>
+
+      
+       <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
+    </div>
+</article>
+
+
+
+
+
+
+
+    
+
+
+
+
+    </div>
+    <div class="copyright">
+        <p class="footer-entry">
+    ©2023 GoIruri
+</p>
+<p class="footer-entry">Built with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
+
+    </div>
+    <div class="full-toc">
+        <button class="full" data-title="切换全屏 快捷键 s"><span class="min "></span></button>
+<a class="" id="rocket" ></a>
+
+    </div>
+</div>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":400},"mobile":{"show":false},"log":false});</script></body>
+<script src="/js/jquery.pjax.js?v=1.1.0" ></script>
+
+<script src="/js/script.js?v=1.1.0" ></script>
+<script>
+    var img_resize = 'default';
+    function initArticle() {
+        /*渲染对应的表格样式*/
+        
+            $("#post .pjax table").addClass("green_title");
+        
+
+        /*渲染打赏样式*/
+        
+
+        /*高亮代码块行号*/
+        
+
+        /*访问数量*/
+        
+        $.getScript("//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js");
+        
+
+        /*代码高亮，行号对齐*/
+        $('.pre-numbering').css('line-height',$('.has-numbering').css('line-height'));
+
+        
+        
+    }
+
+    /*打赏页面隐藏与展示*/
+    
+
+</script>
+
+<!--加入行号的高亮代码块样式-->
+
+<!--自定义样式设置-->
+<style>
+    
+    
+    .nav {
+        width: 542px;
+    }
+    .nav.fullscreen {
+        margin-left: -542px;
+    }
+    .nav-left {
+        width: 120px;
+    }
+    
+    
+    @media screen and (max-width: 1468px) {
+        .nav {
+            width: 492px;
+        }
+        .nav.fullscreen {
+            margin-left: -492px;
+        }
+        .nav-left {
+            width: 100px;
+        }
+    }
+    
+    
+    @media screen and (max-width: 1024px) {
+        .nav {
+            width: 492px;
+            margin-left: -492px
+        }
+        .nav.fullscreen {
+            margin-left: 0;
+        }
+    }
+    
+    @media screen and (max-width: 426px) {
+        .nav {
+            width: 100%;
+        }
+        .nav-left {
+            width: 100%;
+        }
+    }
+    
+    
+    .nav-right .title-list nav a .post-title, .nav-right .title-list #local-search-result a .post-title {
+        color: #383636;
+    }
+    
+    
+    .nav-right .title-list nav a .post-date, .nav-right .title-list #local-search-result a .post-date {
+        color: #5e5e5f;
+    }
+    
+    
+    .nav-right nav a.hover, #local-search-result a.hover{
+        background-color: #e2e0e0;
+    }
+    
+    
+
+    /*列表样式*/
+    
+
+    /* 背景图样式 */
+    
+    #post {
+        background: url(/img/background.jpeg);
+    }
+    
+    
+    #post .index {
+        background: url(/img/background.jpeg);
+    }
+    
+
+
+    /*引用块样式*/
+    
+
+    /*文章列表背景图*/
+    
+    .nav-right:before {
+        content: ' ';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.4;
+        background: url("https://i.loli.net/2019/07/22/5d3521411f3f169375.png");
+        background-repeat: no-repeat;
+        background-position: 50% 0;
+        -ms-background-size: cover;
+        -o-background-size: cover;
+        -moz-background-size: cover;
+        -webkit-background-size: cover;
+        background-size: cover;
+    }
+    
+
+    
+</style>
+
+
+
+
+
+
+
+</html>

@@ -3,9 +3,9 @@
 <meta name="referrer" content="no-referrer" />
 <head>
   <meta charset="utf-8">
-  <title>about | Hexo</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="about | Hexo">
+  <title>编译 | Hexo</title>
+  <meta name="keywords" content=" Go , 编译 ">
+  <meta name="description" content="编译 | Hexo">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="404">
@@ -390,24 +390,43 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+        <article id="post-编译器优化" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">about</h1>
+        <h1 class="article-title">编译</h1>
     
     <div class="article-meta">
         
         
         
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Go">Go</a> > 
+            
+            <a  data-rel="Go&lt;---&gt;编译">编译</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">Go</a>
+            
+            <a class="color3">编译</a>
+            
+        </span>
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:13:32'>2023-03-01 12:12</time>
+            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:29:15'>2023-03-01 12:29</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:7</span>
+        <span>字数:961</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -426,7 +445,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E4%B8%8D%E7%9F%A5%E5%90%8D%E9%BB%91%E5%AE%A2"><span class="toc-text">一个不知名黑客</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">编译器的结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="toc-text">静态分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E7%A8%8B%E5%86%85%E5%88%86%E6%9E%90%E5%92%8C%E8%BF%87%E7%A8%8B%E9%97%B4%E5%88%86%E6%9E%90"><span class="toc-text">过程内分析和过程间分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E5%99%A8%E4%BC%98%E5%8C%96"><span class="toc-text">编译器优化</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%86%85%E8%81%94%EF%BC%88Inling%EF%BC%89"><span class="toc-text">函数内联（Inling）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Beast-Mode"><span class="toc-text">Beast Mode</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90"><span class="toc-text">逃逸分析</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -442,7 +461,134 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一个不知名黑客"><a href="#一个不知名黑客" class="headerlink" title="一个不知名黑客"></a>一个不知名黑客</h3>
+        <h4 id="编译器的结构"><a href="#编译器的结构" class="headerlink" title="编译器的结构"></a>编译器的结构</h4><ul>
+<li>重要的系统软件<ul>
+<li>识别符合语法和非法的程序</li>
+<li>生成正确且高效的代码</li>
+</ul>
+</li>
+<li>分析部分（前端front end）<ul>
+<li>词法分析，生成词素（lexeme）</li>
+<li>语法分析，生成语法树</li>
+<li>语义分析，收集类型信息，进行语义检查</li>
+<li>中间代码生成，生成intermediate representation（IR)</li>
+</ul>
+</li>
+<li>综合部分（后端back end）<ul>
+<li>代码优化，机器无关优化，生成优化后的IR</li>
+<li>代码生成，生成目标代码</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1675066565306-3a3856da-5f85-4c8d-83ee-37c0cb62de57.png#averageHue=%23f4f4f4&clientId=u6b43466c-1c30-4&from=paste&height=462&id=u66082976&name=image.png&originHeight=924&originWidth=970&originalType=binary&ratio=1&rotation=0&showTitle=false&size=237839&status=done&style=none&taskId=u073ffd6d-2780-4847-ad0d-7b129951fde&title=&width=485" alt="image.png"></p>
+<h4 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h4><ul>
+<li>静态分析：不执行程序代码，推导程序的行为，分析程序的性质。</li>
+<li>控制流（control flow）：程序执行的流程</li>
+<li>数据量（data flow）：数据在控制流上的传递</li>
+<li>根据分析控制流和数据流，我们可以知道更多关于程序的性质（properties）</li>
+<li>根据这些性质优化代码</li>
+</ul>
+<h4 id="过程内分析和过程间分析"><a href="#过程内分析和过程间分析" class="headerlink" title="过程内分析和过程间分析"></a>过程内分析和过程间分析</h4><ul>
+<li>过程内分析（intra-procedural analysis）<ul>
+<li>仅在函数内部进行分析</li>
+</ul>
+</li>
+<li>过程间分析（inter-procedural analysis）<ul>
+<li>考虑函数调用时参数传递和返回值的数据流和控制流</li>
+</ul>
+</li>
+<li>为什么过程间分析是个问题？<ul>
+<li>需要通过数据流分析得知 i 的具体类型，才知道i.foo()调用的是哪个foo()</li>
+<li>根据 i 的具体类型，产生了新的控制流，i.foo()，分析继续</li>
+<li>过程间分析需要同时分析控制流和数据流—联合求解，比较复杂<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> I <span class="keyword">interface</span>&#123;</span><br><span class="line">    foo()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> A <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"><span class="keyword">type</span> B <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *A)</span></span> foo() &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span></span> foo() &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">bar</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ...</span><br><span class="line">	i.foo()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  分析A.foo()，还是B.foo()?</li>
+</ul>
+</li>
+</ul>
+<h4 id="编译器优化"><a href="#编译器优化" class="headerlink" title="编译器优化"></a>编译器优化</h4><ul>
+<li>为什么做编译器优化<ul>
+<li>用户无感知，重新编译即可获得性能效益</li>
+<li>通用性优化</li>
+</ul>
+</li>
+<li>现状<ul>
+<li>采用的优化少</li>
+<li>编译时间短，没有进行复杂的代码分析和优化</li>
+</ul>
+</li>
+<li>编译优化的思路<ul>
+<li>场景：面向后端长期执行任务</li>
+<li>Tradeoff：用编译时间换取更高效的机器码</li>
+</ul>
+</li>
+<li>Best mode<ul>
+<li>函数内联</li>
+<li>逃逸分析</li>
+<li>默认栈大小调整</li>
+<li>边界检查消除</li>
+<li>循环展开</li>
+<li>……</li>
+</ul>
+</li>
+</ul>
+<h5 id="函数内联（Inling）"><a href="#函数内联（Inling）" class="headerlink" title="函数内联（Inling）"></a>函数内联（Inling）</h5><ul>
+<li>内联：将被调用函数的函数体（callee）的副本替换到调用位置（caller）上，同时重写代码及反映参数的绑定</li>
+<li>优点<ul>
+<li>消除函数调用开销，例如传递参数、保存寄存器等</li>
+<li>将过程间分析转化为过程内分析，帮助其他优化，例如逃逸分析</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>函数体变大，instruction cache（icache）不友好</li>
+<li>编译生成的Go镜像变大</li>
+</ul>
+</li>
+<li>函数内联在大多数情况下是正向优化</li>
+<li>内联策略<ul>
+<li>调用和被调函数的规模</li>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<h5 id="Beast-Mode"><a href="#Beast-Mode" class="headerlink" title="Beast Mode"></a>Beast Mode</h5><ul>
+<li>Go函数内联受到的限制较多<ul>
+<li>语言特性，例如interface，defer等，限制了函数内联</li>
+<li>内联策略非常保守</li>
+</ul>
+</li>
+<li>Beast mode：调整函数内联的策略，使更多函数被内联<ul>
+<li>降低函数调用的开销</li>
+<li>增加了其他优化的机会：逃逸分析</li>
+</ul>
+</li>
+<li>开销<ul>
+<li>Go镜像增加~10%</li>
+<li>编译时间增加</li>
+</ul>
+</li>
+</ul>
+<h4 id="逃逸分析"><a href="#逃逸分析" class="headerlink" title="逃逸分析"></a>逃逸分析</h4><ul>
+<li>逃逸分析：分析代码中指针的动态作用域：指针在何处可以被访问</li>
+<li>大致思路<ul>
+<li>从对象分配处出发，沿着控制流，观察对象的数据流</li>
+<li>若发现指针p在当前作用域s：<ul>
+<li>作为参数传递给其他函数</li>
+<li>传递给全局变量</li>
+<li>传递给其他的goroutine</li>
+<li>传递给已逃逸的指针指向的对象</li>
+</ul>
+</li>
+<li>则指针p指向的对象逃逸出s，反之则没有逃逸出s</li>
+</ul>
+</li>
+<li>Beast mode：函数内联拓展了函数边界，更多对象不逃逸</li>
+<li>优化：未逃逸的对象可以在栈上分配<ul>
+<li>对象在栈上分配和回收很快：移动sp</li>
+<li>减少在heap上的分配，降低GC负担</li>
+</ul>
+</li>
+</ul>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
     </div>

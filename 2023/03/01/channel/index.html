@@ -3,9 +3,9 @@
 <meta name="referrer" content="no-referrer" />
 <head>
   <meta charset="utf-8">
-  <title>about | Hexo</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="about | Hexo">
+  <title>channel | Hexo</title>
+  <meta name="keywords" content=" Go , 并发 ">
+  <meta name="description" content="channel | Hexo">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="404">
@@ -390,24 +390,43 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+        <article id="post-channel" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">about</h1>
+        <h1 class="article-title">channel</h1>
     
     <div class="article-meta">
         
         
         
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Go">Go</a> > 
+            
+            <a  data-rel="Go&lt;---&gt;并发">并发</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">Go</a>
+            
+            <a class="color3">并发</a>
+            
+        </span>
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:13:32'>2023-03-01 12:12</time>
+            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:28:58'>2023-03-01 12:28</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:7</span>
+        <span>字数:426</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -426,7 +445,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E4%B8%8D%E7%9F%A5%E5%90%8D%E9%BB%91%E5%AE%A2"><span class="toc-text">一个不知名黑客</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#channel%E7%9A%84%E7%89%B9%E6%80%A7"><span class="toc-text">channel的特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#channel%E7%9A%84ring-buffer%E5%AE%9E%E7%8E%B0"><span class="toc-text">channel的ring buffer实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E7%BC%93%E5%86%B2channel%E5%92%8C%E6%9C%89%E7%BC%93%E5%86%B2channel%E7%9A%84demo"><span class="toc-text">无缓冲channel和有缓冲channel的demo</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -442,7 +461,21 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一个不知名黑客"><a href="#一个不知名黑客" class="headerlink" title="一个不知名黑客"></a>一个不知名黑客</h3>
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><ul>
+<li>Go语⾔中，不要通过共享内存来通信，⽽要通过通信来实现内存共享。Go的 CSP(Communicating Sequential Process)并发模型，中⽂可以叫做通信顺序进程，是通过 goroutine 和 channel 来实现的。所以 channel 收发遵循先进先出 FIFO，分为有缓存和⽆缓存，channel 中⼤致有 buffer(当缓冲区⼤⼩部位0 时， 是个 ring buffer)、sendx 和 recvx 收发的位置(ring buffer 记录实现)、sendq、recvq 当前 channel 因为缓冲区不⾜⽽阻塞的队列、使⽤双向链表存储、还有⼀个 mutex 锁控制并发、其他原属等。</li>
+<li>向channel写入数据和从channel里面读数据都是原子性的，所以channel是并发安全的。</li>
+</ul>
+<h3 id="channel的特性"><a href="#channel的特性" class="headerlink" title="channel的特性"></a>channel的特性</h3><ol>
+<li>给⼀个 nil channel 发送数据，造成永远阻塞 </li>
+<li>从⼀个 nil channel 接收数据，造成永远阻塞 </li>
+<li>给⼀个已经关闭的 channel 发送数据，引起 panic </li>
+<li>从⼀个已经关闭的 channel 接收数据，如果缓冲区中为空，则返回⼀个零值 </li>
+<li>⽆缓冲的 channel 是同步的，⽽有缓冲的 channel 是⾮同步的 </li>
+<li>关闭⼀个 nil channel 将会发⽣ panic</li>
+</ol>
+<h3 id="channel的ring-buffer实现"><a href="#channel的ring-buffer实现" class="headerlink" title="channel的ring buffer实现"></a>channel的ring buffer实现</h3><p>channel 中使⽤了 ring buffer(环形缓冲区)来缓存写⼊的数据。ring buffer 有很多好处，⽽且⾮常适合⽤来实现 FIFO 式的固定⻓度队列。在 channel 中，ring buffer 的实现如下：<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1676210671910-4380e9f1-7d6a-473c-893a-abe2bca86a46.png#averageHue=%23f8f5ef&clientId=uff3cd2e6-3bae-4&from=paste&height=176&id=u4e128661&name=image.png&originHeight=351&originWidth=919&originalType=binary&ratio=2&rotation=0&showTitle=false&size=58819&status=done&style=none&taskId=u0ee0dd8b-7799-42db-b8c4-b068b25fd98&title=&width=459.5" alt="image.png"><br>hchan 中有两个与 buffer 相关的变量:recvx 和 sendx。其中 sendx 表示buffer 中可写的 index，recvx 表示 buffer 中可读的 index。从 recvx 到 sendx 之间的元素，表示已正常存放⼊ buffer 中的数据。<br>我们可以直接使⽤ buf[recvx]来读取到队列的第⼀个元素，使⽤ buf[sendx]&#x3D; x 来将元素放到队尾。</p>
+<h3 id="无缓冲channel和有缓冲channel的demo"><a href="#无缓冲channel和有缓冲channel的demo" class="headerlink" title="无缓冲channel和有缓冲channel的demo"></a>无缓冲channel和有缓冲channel的demo</h3><p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1676210830796-11898cd8-a5a3-4ec3-abdc-a48bd6da9ee5.png#averageHue=%232d2d2c&clientId=uff3cd2e6-3bae-4&from=paste&height=653&id=u9e29d5c5&name=image.png&originHeight=1306&originWidth=1010&originalType=binary&ratio=2&rotation=0&showTitle=false&size=131297&status=done&style=none&taskId=uce865e3f-5454-40e2-a267-ed77ba9f633&title=&width=505" alt="image.png"><br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1676210889353-b9d003ed-ee3f-4a2d-8e3f-9f576dbf4cb9.png#averageHue=%232e2d2c&clientId=uff3cd2e6-3bae-4&from=paste&height=799&id=u3b5d1aeb&name=image.png&originHeight=1494&originWidth=894&originalType=binary&ratio=2&rotation=0&showTitle=false&size=160958&status=done&style=none&taskId=ubb362771-da16-4168-8c55-3dcdae42618&title=&width=478" alt="image.png"></p>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
     </div>

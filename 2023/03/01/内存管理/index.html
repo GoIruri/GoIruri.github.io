@@ -3,9 +3,9 @@
 <meta name="referrer" content="no-referrer" />
 <head>
   <meta charset="utf-8">
-  <title>about | Hexo</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="about | Hexo">
+  <title>Hexo</title>
+  <meta name="keywords" content=" Go , 内存管理 ">
+  <meta name="description" content="Hexo">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="404">
@@ -390,24 +390,41 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">about</h1>
+        <article id="post-内存管理" class="article article-type-post" itemscope itemprop="blogPost">
     
     <div class="article-meta">
         
         
         
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Go">Go</a> > 
+            
+            <a  data-rel="Go&lt;---&gt;内存">内存</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">Go</a>
+            
+            <a class="color5">内存管理</a>
+            
+        </span>
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:13:32'>2023-03-01 12:12</time>
+            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:29:25'>2023-03-01 12:29</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:7</span>
+        <span>字数:525</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -426,7 +443,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E4%B8%8D%E7%9F%A5%E5%90%8D%E9%BB%91%E5%AE%A2"><span class="toc-text">一个不知名黑客</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%9D%97"><span class="toc-text">分块</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E5%AD%98"><span class="toc-text">缓存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%BC%98%E5%8C%96"><span class="toc-text">内存管理优化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8%E5%86%85%E9%83%A8Go-SDK%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88%EF%BC%9ABalanced-GC"><span class="toc-text">字节跳动内部Go SDK优化方案：Balanced GC</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -442,7 +459,63 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一个不知名黑客"><a href="#一个不知名黑客" class="headerlink" title="一个不知名黑客"></a>一个不知名黑客</h3>
+        <h4 id="分块"><a href="#分块" class="headerlink" title="分块"></a>分块</h4><ul>
+<li>目标：为对象在heap上分配内存</li>
+<li>提前将内存分块<ul>
+<li>调用系统调用mmap()向OS申请一大块内存，例如4MB</li>
+<li>先将内存分成大块，例如8kb，称作mspan</li>
+<li>再将大块继续划分成特定大小的小块，用于对象分配</li>
+<li>noscan mspan：分配不包含指针的对象–GC不需要扫描</li>
+<li>scan mspan：分配包含指针的对象–GC需要扫描</li>
+</ul>
+</li>
+<li>对象分配：根据对象的大小，选择合适的块返回</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1675046840736-55e3cfdf-4813-4414-846e-962d0a1581a1.png#averageHue=%23eaeae9&clientId=ua4ad922e-96e4-4&from=paste&height=189&id=u304a4fcd&name=image.png&originHeight=378&originWidth=901&originalType=binary&ratio=1&rotation=0&showTitle=false&size=80217&status=done&style=none&taskId=u54e34245-9329-485d-9d66-0ad0c1f95c3&title=&width=450.5" alt="image.png"></p>
+<h4 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h4><ul>
+<li>TCMalloc: thread caching</li>
+<li>每个p包含一个mcache用于快速分配，用于为绑定于p上的g分配对象</li>
+<li>mcache管理一组mspan</li>
+<li>当mcache中的mspan分配完毕，向mcentral申请带有未分配块的mspan</li>
+<li>当mspan中没有分配的对象，mspan会被缓存在mcentral中，而不是立刻释放并归还给OS</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1675047829203-90d1ae51-d9ff-4883-8010-105bc53ce298.png#averageHue=%23f5f5f5&clientId=ua4ad922e-96e4-4&from=paste&height=445&id=u6f794b8f&name=image.png&originHeight=890&originWidth=1131&originalType=binary&ratio=1&rotation=0&showTitle=false&size=272545&status=done&style=none&taskId=ud9f0eeb9-3864-4b84-b17b-2c4327a8ab5&title=&width=565.5" alt="image.png"></p>
+<h4 id="内存管理优化"><a href="#内存管理优化" class="headerlink" title="内存管理优化"></a>内存管理优化</h4><ul>
+<li>对象分配是非常高频的操作：每秒分配GB级别的内存</li>
+<li>小对象占比较高</li>
+<li>Go内存分配比较耗时<ul>
+<li>g -&gt; m -&gt; p -&gt; mcache -&gt; mspan -&gt; memory block -&gt; return pointer</li>
+<li>pprof：对象分配的函数是最频繁调用的函数之一</li>
+</ul>
+</li>
+</ul>
+<h4 id="字节跳动内部Go-SDK优化方案：Balanced-GC"><a href="#字节跳动内部Go-SDK优化方案：Balanced-GC" class="headerlink" title="字节跳动内部Go SDK优化方案：Balanced GC"></a>字节跳动内部Go SDK优化方案：Balanced GC</h4><ul>
+<li>每个g都绑定一大块内存（1kb），称作goroutine allocation buffer（GAB）</li>
+<li>GAB用于nosan类型的小对象分配：&lt; 128 B</li>
+<li>使用三个指针维护GAB：base, end, top</li>
+<li>Bump pointer（指针碰撞）风格对象分配<ul>
+<li>无须和其他分配请求互斥</li>
+<li>分配动作简单高效</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1675064361404-4e68d5e2-e8d1-489f-9759-13b4a0194f4b.png#averageHue=%23f2f2f2&clientId=u0e254740-b6d6-4&from=paste&height=159&id=u30cddaa5&name=image.png&originHeight=318&originWidth=2089&originalType=binary&ratio=1&rotation=0&showTitle=false&size=203217&status=done&style=none&taskId=u20ad8cd9-232a-4f7c-b383-329e754a70c&title=&width=1044.5" alt="image.png"></p>
+<ul>
+<li>GAB对于Go内存管理来说是一个大对象</li>
+<li>本质：将多个小对象的分配合并成一次大对象的分配</li>
+<li>问题：GAB的对象分配方式会导致内存被延迟释放</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1675064571649-e4bb1080-16d6-4f1e-90fe-0df1f41d191a.png#averageHue=%23fefefc&clientId=u0e254740-b6d6-4&from=paste&height=205&id=udc9d0031&name=image.png&originHeight=410&originWidth=1063&originalType=binary&ratio=1&rotation=0&showTitle=false&size=83240&status=done&style=none&taskId=u3b93adf2-b4ae-4de0-ba47-21aa7912e8e&title=&width=531.5" alt="image.png"></p>
+<ul>
+<li>方案：移动GAB中存活的对象<ul>
+<li>当GAB总大小超过一定阈值时，将GAB中存活的对象复制到另外分配的GAB中</li>
+<li>原先的GAB可以释放，避免内存泄露</li>
+<li>本质：用copying GC的算法管理小对象（根据对象的生命周期，使用不同的标记和清理策略）</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1675064951875-d9175f50-0573-4107-adab-9e1c729b0f3a.png#averageHue=%23edecec&clientId=u0e254740-b6d6-4&from=paste&height=217&id=u65970c9b&name=image.png&originHeight=433&originWidth=1302&originalType=binary&ratio=1&rotation=0&showTitle=false&size=132918&status=done&style=none&taskId=u4edc6474-f17a-4186-bcab-a6976df4840&title=&width=651" alt="image.png"></p>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
     </div>

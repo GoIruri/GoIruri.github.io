@@ -3,9 +3,9 @@
 <meta name="referrer" content="no-referrer" />
 <head>
   <meta charset="utf-8">
-  <title>about | Hexo</title>
-  <meta name="keywords" content="">
-  <meta name="description" content="about | Hexo">
+  <title>性能调优 | Hexo</title>
+  <meta name="keywords" content=" Go , 优化 ">
+  <meta name="description" content="性能调优 | Hexo">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="404">
@@ -390,24 +390,43 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+        <article id="post-性能调优" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">about</h1>
+        <h1 class="article-title">性能调优</h1>
     
     <div class="article-meta">
         
         
         
+        <span class="book">
+            <i class="iconfont icon-category"></i>
+            
+            
+            <a  data-rel="Go">Go</a> > 
+            
+            <a  data-rel="Go&lt;---&gt;优化">优化</a>
+            
+        </span>
+        
+        
+        <span class="tag">
+            <i class="iconfont icon-tag"></i>
+            
+            <a class="color3">Go</a>
+            
+            <a class="color3">优化</a>
+            
+        </span>
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:13:32'>2023-03-01 12:12</time>
+            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:29:34'>2023-03-01 12:29</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:7</span>
+        <span>字数:690</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -426,7 +445,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E4%B8%8D%E7%9F%A5%E5%90%8D%E9%BB%91%E5%AE%A2"><span class="toc-text">一个不知名黑客</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98"><span class="toc-text">性能调优</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%BB%BA%E8%AE%AE"><span class="toc-text">性能优化建议</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%8E%9F%E5%88%99"><span class="toc-text">性能调优原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7pprof"><span class="toc-text">性能分析工具pprof</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7pprof-%E9%87%87%E6%A0%B7%E8%BF%87%E7%A8%8B%E5%92%8C%E5%8E%9F%E7%90%86"><span class="toc-text">性能分析工具pprof-采样过程和原理</span></a></li></ol></li></ol></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -442,7 +461,103 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一个不知名黑客"><a href="#一个不知名黑客" class="headerlink" title="一个不知名黑客"></a>一个不知名黑客</h3>
+        <h2 id="性能调优"><a href="#性能调优" class="headerlink" title="性能调优"></a>性能调优</h2><h4 id="性能优化建议"><a href="#性能优化建议" class="headerlink" title="性能优化建议"></a>性能优化建议</h4><ol>
+<li>slice和map预分配空间性能会更好。 </li>
+<li>字符串处理</li>
+</ol>
+<ul>
+<li>使用 + 拼接性能最差，strings.Builder，bytes.Buffer相近，strings.Builder更快 </li>
+<li>分析 <ul>
+<li>字符串在Go语言中是不可变类型，占用内存大小是固定的</li>
+<li>使用 + 每次都会重新分配内存</li>
+<li>strings.Builder，bytes.Buffer底层都是[]byte数组</li>
+<li>内存扩容策略，不需要每次拼接重新分配内存</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>使用空结构体节省内存</li>
+</ol>
+<ul>
+<li>空结构体struct{}实例不占据任何的内存空间，可作为各场景下的占位符使用 <ul>
+<li>节省资源</li>
+<li>空结构体本身具备很强的语义，即这里不需要任何值，仅作为占位符</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li>使用atomatic包</li>
+</ol>
+<ul>
+<li>锁的实现是通过操作系统，属于系统调用</li>
+<li>atomatic操作是通过硬件实现的，效率比锁高</li>
+<li>sync.Mutex应该用来保护一段逻辑，而不仅仅用于保护一个变量</li>
+<li>对于非数值操作，可以用atomatic.Value，承载一个interface{}</li>
+</ul>
+<h4 id="性能调优原则"><a href="#性能调优原则" class="headerlink" title="性能调优原则"></a>性能调优原则</h4><ul>
+<li>要依靠数据不是猜测</li>
+<li>要定位最大瓶颈而不是细枝末节</li>
+<li>不要过早优化</li>
+<li>不要过度优化</li>
+</ul>
+<h4 id="性能分析工具pprof"><a href="#性能分析工具pprof" class="headerlink" title="性能分析工具pprof"></a>性能分析工具pprof</h4><ul>
+<li>说明 <ul>
+<li>希望知道应用在什么地方耗费了多少cpu、memory</li>
+<li>pprof是用于可视化和分析性能分析数据的工具</li>
+</ul>
+</li>
+<li>功能简介<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674375998566-4c4f384a-fb27-4f81-bf00-53c3ac701676.png#averageHue=%23e5ebef&clientId=uee0775e0-e345-4&from=paste&height=424&id=u70a84803&name=1.png&originHeight=848&originWidth=2418&originalType=binary&ratio=1&rotation=0&showTitle=false&size=404122&status=done&style=none&taskId=u0c616a38-3715-4e83-b533-6f307632ae6&title=&width=1209" alt="1.png"> </li>
+<li>浏览器查看指标<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376017559-3122eba6-d229-4026-817e-566f6e7c44f9.png#averageHue=%232d2d2c&clientId=uee0775e0-e345-4&from=paste&height=599&id=u9daffbbb&name=2.png&originHeight=1198&originWidth=1440&originalType=binary&ratio=1&rotation=0&showTitle=false&size=153760&status=done&style=none&taskId=u3f1686b1-e184-4f0e-a3a5-50c3f4173af&title=&width=720" alt="2.png"><br>浏览器访问localhost:6060&#x2F;debuf&#x2F;pprof即可查看。 </li>
+<li>CPU<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376037282-8af26100-32eb-420e-975c-9bf4dce483af.png#averageHue=%235f7b92&clientId=uee0775e0-e345-4&from=paste&height=513&id=u0aede223&name=3.png&originHeight=1026&originWidth=1900&originalType=binary&ratio=1&rotation=0&showTitle=false&size=791895&status=done&style=none&taskId=uae7a715e-0c24-435c-9456-525ec4171e4&title=&width=950" alt="3.png"><br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376046404-982003ef-4c0a-4108-bbdd-d49b861a2857.png#averageHue=%2337578e&clientId=uee0775e0-e345-4&from=paste&height=428&id=ucfc46a83&name=4.png&originHeight=856&originWidth=2596&originalType=binary&ratio=1&rotation=0&showTitle=false&size=1100572&status=done&style=none&taskId=ua0e7c438-54b4-4097-af0e-3b5276c4cab&title=&width=1298" alt="4.png"> <ul>
+<li>falt &#x3D;&#x3D; cum,说明函数中没有调用其他函数</li>
+<li>flat &#x3D;&#x3D; 0， 函数中只有其他函数的调用</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376073797-c1e243b8-6b5c-4cb1-8026-28c9d644bab9.png#averageHue=%231c3460&clientId=uee0775e0-e345-4&from=paste&height=514&id=u202a7265&name=5.png&originHeight=1028&originWidth=2094&originalType=binary&ratio=1&rotation=0&showTitle=false&size=750344&status=done&style=none&taskId=ue5f8c09f-a89b-49d8-8bf1-ad9858a3260&title=&width=1047" alt="5.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376079665-651cc6b6-3f6a-4efc-82f0-94665b0e215f.png#averageHue=%23eef0ee&clientId=uee0775e0-e345-4&from=paste&height=508&id=uf47dc7d5&name=6.png&originHeight=1016&originWidth=2422&originalType=binary&ratio=1&rotation=0&showTitle=false&size=415935&status=done&style=none&taskId=u29f0ae24-742d-4f47-868b-5fa80dd7118&title=&width=1211" alt="6.png"></p>
+<ul>
+<li>Heap-堆内存<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376084922-de062018-eda5-4c35-9edb-76a1afced1a1.png#averageHue=%23ecf0ec&clientId=uee0775e0-e345-4&from=paste&height=674&id=u9d32ce16&name=7.png&originHeight=1348&originWidth=2228&originalType=binary&ratio=1&rotation=0&showTitle=false&size=760345&status=done&style=none&taskId=u179e512d-13ad-4f89-9db4-735aa2ae66d&title=&width=1114" alt="7.png"><br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376090969-bff56ac0-bda0-42f5-89af-b71177f273c7.png#averageHue=%23f4f8f8&clientId=uee0775e0-e345-4&from=paste&height=614&id=ub431bb68&name=8.png&originHeight=1228&originWidth=2352&originalType=binary&ratio=1&rotation=0&showTitle=false&size=812821&status=done&style=none&taskId=u7489de4e-4c5c-4416-9394-07af351bf66&title=&width=1176" alt="8.png"> </li>
+<li>Goroutine泄露也会导致内存泄露 <ul>
+<li>火焰图</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674376098120-f3f5cdd5-4b31-4fac-9938-727700c57a10.png#averageHue=%23a8bcad&clientId=uee0775e0-e345-4&from=paste&height=535&id=u237bcbc2&name=9.png&originHeight=1070&originWidth=2304&originalType=binary&ratio=1&rotation=0&showTitle=false&size=595132&status=done&style=none&taskId=u3e7d32fe-eb4c-4e18-bbd2-08b0cd8e19f&title=&width=1152" alt="9.png"></p>
+<ul>
+<li>Mutex、block分析同上，把pprof后面改为mutex、block即可。</li>
+</ul>
+<h4 id="性能分析工具pprof-采样过程和原理"><a href="#性能分析工具pprof-采样过程和原理" class="headerlink" title="性能分析工具pprof-采样过程和原理"></a>性能分析工具pprof-采样过程和原理</h4><ul>
+<li>CPU <ul>
+<li>采样对象：函数调用和它们占用的时间</li>
+<li>采样率：100次&#x2F;秒，固定值</li>
+<li>采样时间：从手动启动到手动结束</li>
+</ul>
+</li>
+</ul>
+<p>开始采样-&gt;设定信号处理函数-&gt;开启定时器<br>停止采样-&gt;取消信号处理函数-&gt;关闭定时器<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674387207419-8f683a4f-643c-4021-ab60-5ec1e34bae1e.png#averageHue=%23107be4&clientId=u619903d9-520e-4&from=paste&height=547&id=u540c39d5&name=image.png&originHeight=1094&originWidth=2482&originalType=binary&ratio=1&rotation=0&showTitle=false&size=867802&status=done&style=none&taskId=uf390cb2b-8ca2-450a-ab86-dc1a3391246&title=&width=1241" alt="image.png"></p>
+<ul>
+<li>Heap-堆内存<ul>
+<li>采样程序通过内存分配器在堆上分配和释放的内存，记录分配&#x2F;释放的大小和数量</li>
+<li>采样率：每分配512KB记录一次，可在运行开头修改，1为每次分配均记录</li>
+<li>采样时间：从程序运行开始到采样</li>
+<li>采样指标：alloc_space,alloc_objects,inuse_space,inuse_objects</li>
+<li>计算方式：inuse &#x3D; alloc - free</li>
+</ul>
+</li>
+<li>Goroutine-协程&amp;ThreadCreate-线程创建<ul>
+<li>Goroutine<ul>
+<li>记录所有用户发起且在运行中的Goroutine（即非入口runtime开头的）runtime.main调用栈信息</li>
+</ul>
+</li>
+<li>ThreadCreate<ul>
+<li>记录程序创建的所有系统线程的信息</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1674388814407-8146d2dc-e34e-4270-894c-0b0f16a731c2.png#averageHue=%23378fe0&clientId=u619903d9-520e-4&from=paste&height=157&id=ufc46dba4&name=image.png&originHeight=314&originWidth=2660&originalType=binary&ratio=1&rotation=0&showTitle=false&size=305656&status=done&style=none&taskId=u316a16b6-ce5c-4b61-b4b2-cbac2770c82&title=&width=1330" alt="image.png"></p>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
     </div>
