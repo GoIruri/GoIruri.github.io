@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+
+
+<html theme="dark" showBanner="true" hasBanner="true" > 
+<link href="/fontawesome/css/fontawesome.css" rel="stylesheet">
+<link href="/fontawesome/css/brands.css" rel="stylesheet">
+<link href="/fontawesome/css/solid.css" rel="stylesheet">
+<script src="/js/color.global.min.js" ></script>
+<script src="/js/load-settings.js" ></script>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+
+  
+  <title>协程调度器原理及GMP设计思想 | GoIruri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+  <meta name="description" content="Golang的协程调度器原理及GMP设计思想一、Golang“调度器”的由来？(1) 单进程时代不需要调度器我们知道，一切的软件都是跑在操作系统上，真正用来干活(计算)的是CPU。早期的操作系统每个程序就是一个进程，直到一个程序运行完，才能进行下一个进程，就是“单进程时代”一切的程序只能串行发生。早期的单进程操作系统，面临2个问题：1.单一的执行流程，计算机只能一个任务一个任务处理。2.进程阻塞所">
+<meta property="og:type" content="article">
+<meta property="og:title" content="协程调度器原理及GMP设计思想">
+<meta property="og:url" content="http://example.com/2023/01/18/%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/index.html">
+<meta property="og:site_name" content="GoIruri">
+<meta property="og:description" content="Golang的协程调度器原理及GMP设计思想一、Golang“调度器”的由来？(1) 单进程时代不需要调度器我们知道，一切的软件都是跑在操作系统上，真正用来干活(计算)的是CPU。早期的操作系统每个程序就是一个进程，直到一个程序运行完，才能进行下一个进程，就是“单进程时代”一切的程序只能串行发生。早期的单进程操作系统，面临2个问题：1.单一的执行流程，计算机只能一个任务一个任务处理。2.进程阻塞所">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375752-8196ceae-bd91-4ef3-b303-db89aecaf312.png#averageHue=%23fbfbfb&clientId=u6f8446ca-1d24-4&from=paste&id=u904e4bb4&originHeight=560&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=85223&status=done&style=none&taskId=uf4598ecc-2211-490d-80cf-ea137f3ab59&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375730-5e191a9b-f141-4365-a41c-84e6b6491bc9.png#averageHue=%23fbfbfb&clientId=u6f8446ca-1d24-4&from=paste&id=u72e2dc22&originHeight=656&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=125250&status=done&style=none&taskId=u80bad9b4-4035-4273-9c5c-ed89d1ee6d4&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375726-397d9665-c642-4cde-a5b1-c52c15892058.png#averageHue=%23fbfafa&clientId=u6f8446ca-1d24-4&from=paste&id=u72c6f5d3&originHeight=508&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=100160&status=done&style=none&taskId=ud1393fea-e2b2-40eb-bf6f-2ce863f0c46&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375735-e418073f-83bb-4836-84de-271eda59381e.png#averageHue=%23fbf7e7&clientId=u6f8446ca-1d24-4&from=paste&id=u3927bef1&originHeight=641&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=129173&status=done&style=none&taskId=u092be836-aa38-4b18-b6b4-8b645c13ab7&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375860-cf66be10-e020-4707-b721-43a8ba16a163.png#averageHue=%23faf6e5&clientId=u6f8446ca-1d24-4&from=paste&id=u07414fe3&originHeight=639&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=183568&status=done&style=none&taskId=ucdc4b0f1-c80a-421f-a607-dc91ec4d09a&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529376831-20991e4f-318e-4351-95d4-2ef497dc25a0.png#averageHue=%23faf6e4&clientId=u6f8446ca-1d24-4&from=paste&id=u315241b6&originHeight=606&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=133629&status=done&style=none&taskId=u232b477e-a3e6-403b-b2ec-60dd6612c8e&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529376891-9ec932ae-7643-468d-9e5e-8c9a9c79f3ab.png#averageHue=%23fcfbf5&clientId=u6f8446ca-1d24-4&from=paste&id=ucacf766e&originHeight=631&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=118679&status=done&style=none&taskId=uaac95360-21ab-4d38-b08a-3f6db663a14&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529377178-d7a47abb-d2dd-4904-ae6c-ab6416543a0f.png#averageHue=%23faf6e5&clientId=u6f8446ca-1d24-4&from=paste&id=u0b284cb0&originHeight=624&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=137798&status=done&style=none&taskId=u29696c8f-1180-4b3a-83f1-11473e926e6&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529377162-1a068acc-a631-4de2-9ea4-f62957e6f5cd.png#averageHue=%23fdfcfc&clientId=u6f8446ca-1d24-4&from=paste&id=ua4e2bdc6&originHeight=738&originWidth=984&originalType=url&ratio=1&rotation=0&showTitle=false&size=93009&status=done&style=none&taskId=ua50ad56d-1374-47b3-b610-281e6c1f69d&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529377192-b619ad81-84c2-4171-85af-48c38152c594.png#averageHue=%23fdfdfd&clientId=u6f8446ca-1d24-4&from=paste&id=u18d2934a&originHeight=499&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=99473&status=done&style=none&taskId=u9170eeb8-12ff-4cea-ad38-ab7759c2bd8&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378065-00b6c082-caec-426d-a71c-0bb68f5256a4.png#averageHue=%23fcfbf7&clientId=u6f8446ca-1d24-4&from=paste&id=uc9edb0d6&originHeight=876&originWidth=1068&originalType=url&ratio=1&rotation=0&showTitle=false&size=118438&status=done&style=none&taskId=u8a420ae3-697b-4ce0-a571-b479f3b0a4f&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378267-57367699-0d00-4929-9f88-bb2fb96a69b7.png#averageHue=%23fbf9f7&clientId=u6f8446ca-1d24-4&from=paste&id=udf66bb44&originHeight=563&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=164981&status=done&style=none&taskId=u9eea7c48-29d2-4f98-9506-ff6ce9ea0f5&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378457-957dc494-148b-4632-bf7f-2a9f8f4cb7a9.png#averageHue=%23f9f8f7&clientId=u6f8446ca-1d24-4&from=paste&id=uad9c5293&originHeight=422&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=112626&status=done&style=none&taskId=ud99c82e5-63d2-4981-9667-cb2ab7d719d&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378443-5959b5ce-2f9d-4ea9-a1e9-af8b4d07f818.png#averageHue=%23100e0c&clientId=u6f8446ca-1d24-4&from=paste&id=ud9b1b9da&originHeight=872&originWidth=439&originalType=url&ratio=1&rotation=0&showTitle=false&size=63683&status=done&style=none&taskId=ua23ac074-082f-4e5f-984e-0dc2576b188&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378468-f7be6d52-438b-4902-b7ea-cd6b41be38c9.png#averageHue=%23bbd8ab&clientId=u6f8446ca-1d24-4&from=paste&id=u11cf0f6b&originHeight=546&originWidth=2724&originalType=url&ratio=1&rotation=0&showTitle=false&size=82065&status=done&style=none&taskId=u89a4185d-933d-4e79-acfd-be58f94bfc0&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379036-d4524615-d54c-41bc-a674-e1f559b0a57b.png#averageHue=%23829283&clientId=u6f8446ca-1d24-4&from=paste&id=u038c10c1&originHeight=556&originWidth=492&originalType=url&ratio=1&rotation=0&showTitle=false&size=83539&status=done&style=none&taskId=u12285179-787a-4223-8637-c88f82b209e&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379481-6f9ead88-10b3-4e99-a49a-3706d5be3abe.png#averageHue=%23f6f0ed&clientId=u6f8446ca-1d24-4&from=paste&id=u5968a1ca&originHeight=372&originWidth=1168&originalType=url&ratio=1&rotation=0&showTitle=false&size=44555&status=done&style=none&taskId=u799bda80-a682-429b-b395-c13190ad717&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379633-10ac9720-9d28-469e-bdb7-369b5867de43.png#averageHue=%23f0eeec&clientId=u6f8446ca-1d24-4&from=paste&id=ub89fe639&originHeight=248&originWidth=1146&originalType=url&ratio=1&rotation=0&showTitle=false&size=27256&status=done&style=none&taskId=ua5d1fb5a-59d0-4f6a-bfc1-3e510cc72d8&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379675-23843feb-d9c7-4060-937d-8e20d10a1730.png#averageHue=%23f1f1f1&clientId=u6f8446ca-1d24-4&from=paste&id=u2b731b75&originHeight=224&originWidth=2736&originalType=url&ratio=1&rotation=0&showTitle=false&size=31401&status=done&style=none&taskId=udcc4e760-6d99-429f-92b3-3e1bd87031a&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379861-1fe02195-177c-4d7f-865b-c4105ded978b.png#averageHue=%23aacf98&clientId=u6f8446ca-1d24-4&from=paste&id=u23dfeefc&originHeight=466&originWidth=2142&originalType=url&ratio=1&rotation=0&showTitle=false&size=85902&status=done&style=none&taskId=u47952663-d7d5-414c-aa31-ea2d6af8350&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529380079-308a534f-0451-4e4d-9f3d-4a4008cf7d4e.png#averageHue=%23f1f0ee&clientId=u6f8446ca-1d24-4&from=paste&id=u42795447&originHeight=298&originWidth=1086&originalType=url&ratio=1&rotation=0&showTitle=false&size=29398&status=done&style=none&taskId=u7afef279-4538-435e-a3ee-ab333448f85&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529380605-fcefc64d-dc0c-4481-bd62-08a95f556748.png#averageHue=%23fdfcfa&clientId=u6f8446ca-1d24-4&from=paste&id=u6614e348&originHeight=900&originWidth=1074&originalType=url&ratio=1&rotation=0&showTitle=false&size=134869&status=done&style=none&taskId=u963e7269-f970-4578-8456-a8dfa1584fe&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381153-96edc495-2ac9-4172-af1f-a5145f454f5d.png#averageHue=%23fafaf8&clientId=u6f8446ca-1d24-4&from=paste&id=ua9808857&originHeight=454&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=75060&status=done&style=none&taskId=u616f9fe7-911b-4ed7-991b-d25c0586655&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381159-e73861ee-71d2-4ca5-89a7-48e5e5016b44.png#averageHue=%23fbfaf9&clientId=u6f8446ca-1d24-4&from=paste&id=u59763891&originHeight=700&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=117266&status=done&style=none&taskId=u96b043a7-f124-40b2-9f26-c5774335c55&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381222-beafc2d4-6a09-4729-b1ef-b32beda8f692.png#averageHue=%23faf9f8&clientId=u6f8446ca-1d24-4&from=paste&id=u7764d999&originHeight=715&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=151013&status=done&style=none&taskId=u739fd904-9cb0-42b2-96b5-a03356b4252&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381242-d33e0861-8b2d-4d3c-9ccd-ca0be345bf8c.png#averageHue=%23fbfaf9&clientId=u6f8446ca-1d24-4&from=paste&id=ue67bc4a9&originHeight=759&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=144078&status=done&style=none&taskId=u1224241c-2d08-40bb-8a2b-6e317da3784&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381714-b2a0b647-d787-4479-9385-9872795e44cf.png#averageHue=%23fbfbf9&clientId=u6f8446ca-1d24-4&from=paste&id=u9b2a116e&originHeight=417&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=81129&status=done&style=none&taskId=uc4e1776f-752b-4b02-93cb-d0ac2afdbb4&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529382326-69796520-9e6e-4801-be2a-dcd815b58496.png#averageHue=%23f8f7f4&clientId=u6f8446ca-1d24-4&from=paste&id=ua0c6f3ce&originHeight=422&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=154360&status=done&style=none&taskId=u26b49b83-a512-47ca-a598-901ddf8ed0c&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529382411-546914f9-80f0-464c-8a7d-d56d07878cfb.png#averageHue=%23faf9f7&clientId=u6f8446ca-1d24-4&from=paste&id=u09e19a32&originHeight=519&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=102850&status=done&style=none&taskId=u48e33609-bea1-4d0b-a9dc-6750497901a&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529382519-5a37aba8-95b4-465f-b26e-14c81cfdcffd.png#averageHue=%23faf8f6&clientId=u6f8446ca-1d24-4&from=paste&id=u3ecba128&originHeight=483&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=118428&status=done&style=none&taskId=ue2d060c6-9724-4e25-9049-db4f149b151&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529383098-da914ca4-5731-4860-9654-af4accbdfdcb.png#averageHue=%23f9f7f3&clientId=u6f8446ca-1d24-4&from=paste&id=uc5df4134&originHeight=498&originWidth=880&originalType=url&ratio=1&rotation=0&showTitle=false&size=139921&status=done&style=none&taskId=uea43a925-17ed-4e1e-af7c-31eada75e97&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529383019-ecaee668-7b20-40f9-98e0-c261889dd704.png#averageHue=%23f8f8f6&clientId=u6f8446ca-1d24-4&from=paste&id=u459c5bc0&originHeight=488&originWidth=892&originalType=url&ratio=1&rotation=0&showTitle=false&size=125365&status=done&style=none&taskId=u9d05eee3-08ae-4a96-9d14-f1d59beca8b&title=">
+<meta property="article:published_time" content="2023-01-18T10:14:25.000Z">
+<meta property="article:modified_time" content="2023-11-05T11:40:08.180Z">
+<meta property="article:author" content="GoIruri">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375752-8196ceae-bd91-4ef3-b303-db89aecaf312.png#averageHue=%23fbfbfb&clientId=u6f8446ca-1d24-4&from=paste&id=u904e4bb4&originHeight=560&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=85223&status=done&style=none&taskId=uf4598ecc-2211-490d-80cf-ea137f3ab59&title=">
+  
+    <link rel="alternate" href="/atom.xml" title="GoIruri" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/images/avator.jpg">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+<body>
+  
+  
+    
+<div id="banner" class="">
+  <img src="/images/back.png" itemprop="image">
+  <div id="banner-dim"></div>
+</div>
+ 
+   
+  <div id="main-grid" class="shadow   ">
+    <div id="nav" class=""  >
+      <navbar id="navbar">
+  <nav id="title-nav">
+    <a href="/">
+      <div id="vivia-logo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div>GoIruri </div>
+    </a>
+  </nav>
+  <nav id="main-nav">
+    
+      <a class="main-nav-link" href="/">Home</a>
+    
+      <a class="main-nav-link" href="/archives">Archives</a>
+    
+      <a class="main-nav-link" href="/about">About</a>
+    
+  </nav>
+  <nav id="sub-nav">
+    <a id="theme-btn" class="nav-icon">
+      <span class="light-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M438.5-829.913v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-829.913Zm0 747.826v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-82.087ZM877.913-438.5h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537t29.476-12.174h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T877.913-438.5Zm-747.826 0h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T82.087-521.5h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T130.087-438.5Zm660.174-290.87-34.239 32q-12.913 12.674-29.565 12.174-16.653-.5-29.327-13.174-12.674-12.673-12.554-28.826.12-16.152 12.794-28.826l33-35q12.913-12.674 30.454-12.674t30.163 12.847q12.709 12.846 12.328 30.826-.38 17.98-13.054 30.653ZM262.63-203.978l-32 34q-12.913 12.674-30.454 12.674t-30.163-12.847q-12.709-12.846-12.328-30.826.38-17.98 13.054-30.653l33.239-31q12.913-12.674 29.565-12.174 16.653.5 29.327 13.174 12.674 12.673 12.554 28.826-.12 16.152-12.794 28.826Zm466.74 33.239-32-33.239q-12.674-12.913-12.174-29.565.5-16.653 13.174-29.327 12.673-12.674 28.826-13.054 16.152-.38 28.826 12.294l35 33q12.674 12.913 12.674 30.454t-12.847 30.163q-12.846 12.709-30.826 12.328-17.98-.38-30.653-13.054ZM203.978-697.37l-34-33q-12.674-12.913-13.174-29.945-.5-17.033 12.174-29.707t31.326-13.293q18.653-.62 31.326 13.054l32 34.239q11.674 12.913 11.174 29.565-.5 16.653-13.174 29.327-12.673 12.674-28.826 12.554-16.152-.12-28.826-12.794ZM480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm-.247-82q65.703 0 111.475-46.272Q637-414.544 637-480.247t-45.525-111.228Q545.95-637 480.247-637t-111.475 45.525Q323-545.95 323-480.247t45.525 111.975Q414.05-322 479.753-322ZM481-481Z"/></svg></span>
+      <span class="dark-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480.239-116.413q-152.63 0-258.228-105.478Q116.413-327.37 116.413-480q0-130.935 77.739-227.435t206.304-125.043q43.022-9.631 63.87 10.869t3.478 62.805q-8.891 22.043-14.315 44.463-5.424 22.42-5.424 46.689 0 91.694 64.326 155.879 64.325 64.186 156.218 64.186 24.369 0 46.978-4.946 22.609-4.945 44.413-14.076 42.826-17.369 62.967 1.142 20.142 18.511 10.511 61.054Q807.174-280 712.63-198.206q-94.543 81.793-232.391 81.793Zm0-95q79.783 0 143.337-40.217 63.554-40.218 95.793-108.283-15.608 4.044-31.097 5.326-15.49 1.283-31.859.805-123.706-4.066-210.777-90.539-87.071-86.473-91.614-212.092-.24-16.369.923-31.978 1.164-15.609 5.446-30.978-67.826 32.478-108.282 96.152Q211.652-559.543 211.652-480q0 111.929 78.329 190.258 78.329 78.329 190.258 78.329ZM466.13-465.891Z"/></svg></span>
+    </a>
+    
+      <a id="nav-rss-link" class="nav-icon mobile-hide" href="/atom.xml" title="RSS 订阅">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M198-120q-25.846 0-44.23-18.384-18.384-18.385-18.384-44.23 0-25.846 18.384-44.23 18.384-18.385 44.23-18.385 25.846 0 44.23 18.385 18.384 18.384 18.384 44.23 0 25.845-18.384 44.23Q223.846-120 198-120Zm538.385 0q-18.846 0-32.923-13.769-14.076-13.769-15.922-33.23-8.692-100.616-51.077-188.654-42.385-88.039-109.885-155.539-67.5-67.501-155.539-109.885Q283-663.462 182.385-672.154q-19.461-1.846-33.23-16.23-13.769-14.385-13.769-33.846t14.076-32.922q14.077-13.461 32.923-12.23 120.076 8.692 226.038 58.768 105.961 50.077 185.73 129.846 79.769 79.769 129.846 185.731 50.077 105.961 58.769 226.038 1.231 18.846-12.538 32.922Q756.461-120 736.385-120Zm-252 0q-18.231 0-32.423-13.461t-18.653-33.538Q418.155-264.23 348.886-333.5q-69.27-69.27-166.501-84.423-20.077-4.462-33.538-18.961-13.461-14.5-13.461-33.346 0-19.076 13.884-33.23 13.884-14.153 33.115-10.922 136.769 15.384 234.384 112.999 97.615 97.615 112.999 234.384 3.231 19.23-10.538 33.115Q505.461-120 484.385-120Z"/></svg>
+      </a>
+    
+    <div id="nav-menu-btn" class="nav-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M177.37-252.282q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Zm0-186.218q-17.453 0-29.477-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T177.37-521.5h605.26q17.453 0 29.477 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T782.63-438.5H177.37Zm0-186.217q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Z"/></svg>
+    </div>
+  </nav>
+</navbar>
+<div id="nav-dropdown" class="hidden">
+  <div id="dropdown-link-list">
+    
+      <a class="nav-dropdown-link" href="/">Home</a>
+    
+      <a class="nav-dropdown-link" href="/archives">Archives</a>
+    
+      <a class="nav-dropdown-link" href="/about">About</a>
+    
+    
+      <a class="nav-dropdown-link" href="/atom.xml" title="RSS 订阅">RSS</a>
+     
+    </div>
+</div>
+<script>
+  let dropdownBtn = document.getElementById("nav-menu-btn");
+  let dropdownEle = document.getElementById("nav-dropdown");
+  dropdownBtn.onclick = function() {
+    dropdownEle.classList.toggle("hidden");
+  }
+</script>
+    </div>
+    <div id="sidebar-wrapper">
+      <sidebar id="sidebar">
+  
+    <div class="widget-wrap">
+  <div class="info-card">
+    <div class="avatar">
+      
+        <image src=/images/avator.jpg></image>
+      
+      <div class="img-dim"></div>
+    </div>
+    <div class="info">
+      <div class="username">GoIruri </div>
+      <div class="dot"></div>
+      <div class="subtitle">某不知名黑客 </div>
+      <div class="link-list">
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://twitter.com" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://store.steampowered.com" title="Steam"><i class="fa-brands fa-steam"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://github.com/GoIruri" title="GitHub"><i class="fa-brands fa-github"></i></a>
+         
+      </div>  
+    </div>
+  </div>
+</div>
+
+  
+  <div class="sticky">
+    
+      
+
+
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">分类</h3>
+      <div class="category-box"></div>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">标签</h3>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%86%85%E5%AD%98/" rel="tag">内存</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag">内存管理</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" rel="tag">工程实践</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" rel="tag">类型转换</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%BC%96%E8%AF%91/" rel="tag">编译</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">归档</h3>
+      
+      
+        <a class="archive-link" href="/archives/2023/11 ">
+          十一月 2023 
+          <div class="archive-count">6 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/06 ">
+          六月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/04 ">
+          四月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/03 ">
+          三月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/02 ">
+          二月 2023 
+          <div class="archive-count">3 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/01 ">
+          一月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">最新文章</h3>
+      <ul>
+        
+          <a class="recent-link" href="/2023/11/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7-wire/" title="依赖注入wire" >
+            <div class="recent-link-text">
+              依赖注入wire
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/Weblogic%20JNDI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/" title="CVE-2023-21931" >
+            <div class="recent-link-text">
+              CVE-2023-21931
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="IO多路复用" >
+            <div class="recent-link-text">
+              IO多路复用
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/SingleFlight/" title="SigleFlight" >
+            <div class="recent-link-text">
+              SigleFlight
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/%E5%9B%BE%E8%A7%A3Go%E8%AF%AD%E8%A8%80%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" title="内存分配" >
+            <div class="recent-link-text">
+              内存分配
+            </div>
+          </a>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+  </div>
+</sidebar>
+    </div>
+    <div id="content-body">
+      <meta name="referrer" content="no-referrer" />
+ 
+
+<article id="post-协程调度器原理及GMP设计思想" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        协程调度器原理及GMP设计思想
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-01-18T10:14:25.000Z" itemprop="datePublished">2023-01-18</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/Go/">Go</a>><a class="meta-cate-link" href="/categories/Go/%E5%B9%B6%E5%8F%91/">并发</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            6k 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <h1 id="Golang的协程调度器原理及GMP设计思想"><a href="#Golang的协程调度器原理及GMP设计思想" class="headerlink" title="Golang的协程调度器原理及GMP设计思想"></a>Golang的协程调度器原理及GMP设计思想</h1><h4 id="一、Golang“调度器”的由来？"><a href="#一、Golang“调度器”的由来？" class="headerlink" title="一、Golang“调度器”的由来？"></a>一、Golang“调度器”的由来？</h4><h5 id="1-单进程时代不需要调度器"><a href="#1-单进程时代不需要调度器" class="headerlink" title="(1) 单进程时代不需要调度器"></a>(1) 单进程时代不需要调度器</h5><p>我们知道，一切的软件都是跑在操作系统上，真正用来干活(计算)的是CPU。早期的操作系统每个程序就是一个进程，直到一个程序运行完，才能进行下一个进程，就是“单进程时代”<br>一切的程序只能串行发生。<a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/5-%E5%8D%95%E8%BF%9B%E7%A8%8B%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375752-8196ceae-bd91-4ef3-b303-db89aecaf312.png#averageHue=%23fbfbfb&clientId=u6f8446ca-1d24-4&from=paste&id=u904e4bb4&originHeight=560&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=85223&status=done&style=none&taskId=uf4598ecc-2211-490d-80cf-ea137f3ab59&title=" alt="image.png"></a><br>早期的单进程操作系统，面临2个问题：<br>1.单一的执行流程，计算机只能一个任务一个任务处理。<br>2.进程阻塞所带来的CPU时间浪费。<br>那么能不能有多个进程来宏观一起来执行多个任务呢？<br>后来操作系统就具有了<strong>最早的并发能力：多进程并发</strong>，当一个进程阻塞的时候，切换到另外等待执行的进程，这样就能尽量把CPU利用起来，CPU就不浪费了。</p>
+<h5 id="2-多进程-线程时代有了调度器需求"><a href="#2-多进程-线程时代有了调度器需求" class="headerlink" title="(2)多进程&#x2F;线程时代有了调度器需求"></a>(2)多进程&#x2F;线程时代有了调度器需求</h5><p><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/6-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375730-5e191a9b-f141-4365-a41c-84e6b6491bc9.png#averageHue=%23fbfbfb&clientId=u6f8446ca-1d24-4&from=paste&id=u72e2dc22&originHeight=656&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=125250&status=done&style=none&taskId=u80bad9b4-4035-4273-9c5c-ed89d1ee6d4&title=" alt="image.png"></a><br>在多进程&#x2F;多线程的操作系统中，就解决了阻塞的问题，因为一个进程阻塞cpu可以立刻切换到其他进程中去执行，而且调度cpu的算法可以保证在运行的进程都可以被分配到cpu的运行时间片。这样从宏观来看，似乎多个进程是在同时被运行。<br>但新的问题就又出现了，进程拥有太多的资源，进程的创建、切换、销毁，都会占用很长的时间，CPU虽然利用起来了，但如果进程过多，CPU有很大的一部分都被用来进行进程调度了。<br><strong>怎么才能提高CPU的利用率呢？</strong><br>但是对于Linux操作系统来讲，cpu对进程的态度和线程的态度是一样的。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/7-cpu%E5%88%87%E6%8D%A2%E6%B5%AA%E8%B4%B9%E6%88%90%E6%9C%AC.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375726-397d9665-c642-4cde-a5b1-c52c15892058.png#averageHue=%23fbfafa&clientId=u6f8446ca-1d24-4&from=paste&id=u72c6f5d3&originHeight=508&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=100160&status=done&style=none&taskId=ud1393fea-e2b2-40eb-bf6f-2ce863f0c46&title=" alt="image.png"></a><br>很明显，CPU调度切换的是进程和线程。尽管线程看起来很美好，但实际上多线程开发设计会变得更加复杂，要考虑很多同步竞争等问题，如锁、竞争冲突等。</p>
+<h5 id="3-协程来提高CPU利用率"><a href="#3-协程来提高CPU利用率" class="headerlink" title="(3)协程来提高CPU利用率"></a>(3)协程来提高CPU利用率</h5><p>多进程、多线程已经提高了系统的并发能力，但是在当今互联网高并发场景下，为每个任务都创建一个线程是不现实的，因为会消耗大量的内存(进程虚拟内存会占用4GB[32位操作系统], 而线程也要大约4MB)。<br>大量的进程&#x2F;线程出现了新的问题</p>
+<ul>
+<li>高内存占用</li>
+<li>调度的高消耗CPU</li>
+</ul>
+<p>好了，然后工程师们就发现，其实一个线程分为“内核态“线程和”用户态“线程。<br>一个“用户态线程”必须要绑定一个“内核态线程”，但是CPU并不知道有“用户态线程”的存在，它只知道它运行的是一个“内核态线程”(Linux的PCB进程控制块)。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/8-%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%86%85%E6%A0%B8%E5%92%8C%E7%94%A8%E6%88%B7%E6%80%81.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375735-e418073f-83bb-4836-84de-271eda59381e.png#averageHue=%23fbf7e7&clientId=u6f8446ca-1d24-4&from=paste&id=u3927bef1&originHeight=641&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=129173&status=done&style=none&taskId=u092be836-aa38-4b18-b6b4-8b645c13ab7&title=" alt="image.png"></a><br>这样，我们再去细化去分类一下，内核线程依然叫“线程(thread)”，用户线程叫“协程(co-routine)”.<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/9-%E5%8D%8F%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529375860-cf66be10-e020-4707-b721-43a8ba16a163.png#averageHue=%23faf6e5&clientId=u6f8446ca-1d24-4&from=paste&id=u07414fe3&originHeight=639&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=183568&status=done&style=none&taskId=ucdc4b0f1-c80a-421f-a607-dc91ec4d09a&title=" alt="image.png"></a><br>看到这里，我们就要开脑洞了，既然一个协程(co-routine)可以绑定一个线程(thread)，那么能不能多个协程(co-routine)绑定一个或者多个线程(thread)上呢。<br>之后，我们就看到了有3中协程和线程的映射关系：</p>
+<h4 id="N-1关系"><a href="#N-1关系" class="headerlink" title="N:1关系"></a>N:1关系</h4><p>N个协程绑定1个线程，优点就是<strong>协程在用户态线程即完成切换，不会陷入到内核态，这种切换非常的轻量快速</strong>。但也有很大的缺点，1个进程的所有协程都绑定在1个线程上<br>缺点：</p>
+<ul>
+<li>某个程序用不了硬件的多核加速能力</li>
+<li>一旦某协程阻塞，造成线程阻塞，本进程的其他协程都无法执行了，根本就没有并发的能力了。</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/10-N-1%E5%85%B3%E7%B3%BB.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529376831-20991e4f-318e-4351-95d4-2ef497dc25a0.png#averageHue=%23faf6e4&clientId=u6f8446ca-1d24-4&from=paste&id=u315241b6&originHeight=606&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=133629&status=done&style=none&taskId=u232b477e-a3e6-403b-b2ec-60dd6612c8e&title=" alt="image.png"></a></p>
+<h4 id="1-1-关系"><a href="#1-1-关系" class="headerlink" title="1:1 关系"></a>1:1 关系</h4><p>1个协程绑定1个线程，这种最容易实现。协程的调度都由CPU完成了，不存在N:1缺点，<br>缺点：</p>
+<ul>
+<li>协程的创建、删除和切换的代价都由CPU完成，有点略显昂贵了。</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/11-1-1.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529376891-9ec932ae-7643-468d-9e5e-8c9a9c79f3ab.png#averageHue=%23fcfbf5&clientId=u6f8446ca-1d24-4&from=paste&id=ucacf766e&originHeight=631&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=118679&status=done&style=none&taskId=uaac95360-21ab-4d38-b08a-3f6db663a14&title=" alt="image.png"></a></p>
+<h4 id="M-N关系"><a href="#M-N关系" class="headerlink" title="M:N关系"></a>M:N关系</h4><p>M个协程绑定1个线程，是N:1和1:1类型的结合，克服了以上2种模型的缺点，但实现起来最为复杂。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/12-m-n.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529377178-d7a47abb-d2dd-4904-ae6c-ab6416543a0f.png#averageHue=%23faf6e5&clientId=u6f8446ca-1d24-4&from=paste&id=u0b284cb0&originHeight=624&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=137798&status=done&style=none&taskId=u29696c8f-1180-4b3a-83f1-11473e926e6&title=" alt="image.png"></a><br>协程跟线程是有区别的，线程由CPU调度是抢占式的，<strong>协程由用户态调度是协作式的</strong>，一个协程让出CPU后，才执行下一个协程。</p>
+<h5 id="4-Go语言的协程goroutine"><a href="#4-Go语言的协程goroutine" class="headerlink" title="(4)Go语言的协程goroutine"></a>(4)Go语言的协程goroutine</h5><p><strong>Go为了提供更容易使用的并发方法，使用了goroutine和channel</strong>。goroutine来自协程的概念，让一组可复用的函数运行在一组线程之上，即使有协程阻塞，该线程的其他协程也可以被runtime调度，转移到其他可运行的线程上。最关键的是，程序员看不到这些底层的细节，这就降低了编程的难度，提供了更容易的并发。<br>Go中，协程被称为goroutine，它非常轻量，一个goroutine只占几KB，并且这几KB就足够goroutine运行完，这就能在有限的内存空间内支持大量goroutine，支持了更多的并发。虽然一个goroutine的栈只占几KB，但实际是可伸缩的，如果需要更多内容，runtime会自动为goroutine分配。<br>Goroutine特点：</p>
+<ul>
+<li>占用内存更小（几kb）</li>
+<li>调度更灵活(runtime调度)</li>
+</ul>
+<h5 id="5-被废弃的goroutine调度器"><a href="#5-被废弃的goroutine调度器" class="headerlink" title="(5)被废弃的goroutine调度器"></a>(5)被废弃的goroutine调度器</h5><p>好了，既然我们知道了协程和线程的关系，那么最关键的一点就是调度协程的调度器的实现了。<br>Go目前使用的调度器是2012年重新设计的，因为之前的调度器性能存在问题，所以使用4年就被废弃了，那么我们先来分析一下被废弃的调度器是如何运作的？<br>大部分文章都是会用G来表示Goroutine，用M来表示线程，那么我们也会用这种表达的对应关系。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/13-gm.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529377162-1a068acc-a631-4de2-9ea4-f62957e6f5cd.png#averageHue=%23fdfcfc&clientId=u6f8446ca-1d24-4&from=paste&id=ua4e2bdc6&originHeight=738&originWidth=984&originalType=url&ratio=1&rotation=0&showTitle=false&size=93009&status=done&style=none&taskId=ua50ad56d-1374-47b3-b610-281e6c1f69d&title=" alt="image.png"></a><br>下面我们来看看被废弃的golang调度器是如何实现的？<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/14-old%E8%B0%83%E5%BA%A6%E5%99%A8.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529377192-b619ad81-84c2-4171-85af-48c38152c594.png#averageHue=%23fdfdfd&clientId=u6f8446ca-1d24-4&from=paste&id=u18d2934a&originHeight=499&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=99473&status=done&style=none&taskId=u9170eeb8-12ff-4cea-ad38-ab7759c2bd8&title=" alt="image.png"></a><br>M想要执行、放回G都必须访问全局G队列，并且M有多个，即多线程访问同一资源需要加锁进行保证互斥&#x2F;同步，所以全局G队列是有互斥锁进行保护的。<br>老调度器有几个缺点：</p>
+<ol>
+<li>创建、销毁、调度G都需要每个M获取锁，这就形成了<strong>激烈的锁竞争</strong>。</li>
+<li>M转移G会造成<strong>延迟和额外的系统负载</strong>。比如当G中包含创建新协程的时候，M创建了G’，为了继续执行G，需要把G’交给M’执行，也造成了<strong>很差的局部性</strong>，因为G’和G是相关的，最好放在M上执行，而不是其他M’。</li>
+<li>系统调用(CPU在M之间的切换)导致频繁的线程阻塞和取消阻塞操作增加了系统开销。</li>
+</ol>
+<h4 id="二、Goroutine调度器的GMP模型的设计思想"><a href="#二、Goroutine调度器的GMP模型的设计思想" class="headerlink" title="二、Goroutine调度器的GMP模型的设计思想"></a>二、Goroutine调度器的GMP模型的设计思想</h4><p>面对之前调度器的问题，Go设计了新的调度器。<br>在新调度器中，除了M(thread)和G(goroutine)，又引进了P(Processor)。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/15-gmp.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378065-00b6c082-caec-426d-a71c-0bb68f5256a4.png#averageHue=%23fcfbf7&clientId=u6f8446ca-1d24-4&from=paste&id=uc9edb0d6&originHeight=876&originWidth=1068&originalType=url&ratio=1&rotation=0&showTitle=false&size=118438&status=done&style=none&taskId=u8a420ae3-697b-4ce0-a571-b479f3b0a4f&title=" alt="image.png"></a><br><strong>Processor，它包含了运行goroutine的资源</strong>，如果线程想运行goroutine，必须先获取P，P中还包含了可运行的G队列。</p>
+<h5 id="1-GMP模型"><a href="#1-GMP模型" class="headerlink" title="(1)GMP模型"></a>(1)GMP模型</h5><p>在Go中，<strong>线程是运行goroutine的实体，调度器的功能是把可运行的goroutine分配到工作线程上</strong>。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/16-GMP-%E8%B0%83%E5%BA%A6.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378267-57367699-0d00-4929-9f88-bb2fb96a69b7.png#averageHue=%23fbf9f7&clientId=u6f8446ca-1d24-4&from=paste&id=udf66bb44&originHeight=563&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=164981&status=done&style=none&taskId=u9eea7c48-29d2-4f98-9506-ff6ce9ea0f5&title=" alt="image.png"></a></p>
+<ol>
+<li><strong>全局队列</strong>（Global Queue）：存放等待运行的G。</li>
+<li><strong>P的本地队列</strong>：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G’时，G’优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。</li>
+<li><strong>P列表</strong>：所有的P都在程序启动时创建，并保存在数组中，最多有GOMAXPROCS(可配置)个。</li>
+<li><strong>M</strong>：线程想运行任务就得获取P，从P的本地队列获取G，P队列为空时，M也会尝试从全局队列<strong>拿</strong>一批G放到P的本地队列，或从其他P的本地队列<strong>偷</strong>一半放到自己P的本地队列。M运行G，G执行之后，M会从P获取下一个G，不断重复下去。</li>
+</ol>
+<p><strong>Goroutine调度器和OS调度器是通过M结合起来的，每个M都代表了1个内核线程，OS调度器负责把内核线程分配到CPU的核上执行</strong>。</p>
+<h3 id="有关P和M的个数问题"><a href="#有关P和M的个数问题" class="headerlink" title="有关P和M的个数问题"></a>有关P和M的个数问题</h3><p>1、P的数量：</p>
+<ul>
+<li>由启动时环境变量$GOMAXPROCS或者是由runtime的方法GOMAXPROCS()决定。这意味着在程序执行的任意时刻都只有$GOMAXPROCS个goroutine在同时运行。</li>
+</ul>
+<p>2、M的数量:</p>
+<ul>
+<li>go语言本身的限制：go程序启动时，会设置M的最大数量，默认10000.但是内核很难支持这么多的线程数，所以这个限制可以忽略。</li>
+<li>runtime&#x2F;debug中的SetMaxThreads函数，设置M的最大数量</li>
+<li>一个M阻塞了，会创建新的M。</li>
+</ul>
+<p>M与P的数量没有绝对关系，一个M阻塞，P就会去创建或者切换另一个M，所以，即使P的默认数量是1，也有可能会创建很多个M出来。</p>
+<h3 id="P和M何时会被创建"><a href="#P和M何时会被创建" class="headerlink" title="P和M何时会被创建"></a>P和M何时会被创建</h3><p>1、P何时创建：在确定了P的最大数量n后，运行时系统会根据这个数量创建n个P。<br>2、M何时创建：没有足够的M来关联P并运行其中的可运行的G。比如所有的M此时都阻塞住了，而P中还有很多就绪任务，就会去寻找空闲的M，而没有空闲的，就会去创建新的M。</p>
+<h5 id="2-调度器的设计策略"><a href="#2-调度器的设计策略" class="headerlink" title="(2)调度器的设计策略"></a>(2)调度器的设计策略</h5><p><strong>复用线程</strong>：避免频繁的创建、销毁线程，而是对线程的复用。<br>1）work stealing机制<br>当本线程无可运行的G时，尝试从其他线程绑定的P偷取G，而不是销毁线程。<br>2）hand off机制<br>当本线程因为G进行系统调用阻塞时，线程释放绑定的P，把P转移给其他空闲的线程执行。<br><strong>利用并行</strong>：GOMAXPROCS设置P的数量，最多有GOMAXPROCS个线程分布在多个CPU上同时运行。GOMAXPROCS也限制了并发的程度，比如GOMAXPROCS &#x3D; 核数&#x2F;2，则最多利用了一半的CPU核进行并行。<br><strong>抢占</strong>：在coroutine中要等待一个协程主动让出CPU才执行下一个协程，在Go中，一个goroutine最多占用CPU 10ms，防止其他goroutine被饿死，这就是goroutine不同于coroutine的一个地方。<br><strong>全局G队列</strong>：在新的调度器中依然有全局G队列，但功能已经被弱化了，当M执行work stealing从其他P偷不到G时，它可以从全局G队列获取G。</p>
+<h5 id="3-go-func-调度流程"><a href="#3-go-func-调度流程" class="headerlink" title="(3) go func() 调度流程"></a>(3) go func() 调度流程</h5><p><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/18-go-func%E8%B0%83%E5%BA%A6%E5%91%A8%E6%9C%9F.jpeg"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378457-957dc494-148b-4632-bf7f-2a9f8f4cb7a9.png#averageHue=%23f9f8f7&clientId=u6f8446ca-1d24-4&from=paste&id=uad9c5293&originHeight=422&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=112626&status=done&style=none&taskId=ud99c82e5-63d2-4981-9667-cb2ab7d719d&title=" alt="image.png"></a><br>从上图我们可以分析出几个结论：<br>1、我们通过 go func()来创建一个goroutine；<br>2、有两个存储G的队列，一个是局部调度器P的本地队列、一个是全局G队列。新创建的G会先保存在P的本地队列中，如果P的本地队列已经满了就会保存在全局的队列中；<br>3、G只能运行在M中，一个M必须持有一个P，M与P是1：1的关系。M会从P的本地队列弹出一个可执行状态的G来执行，如果P的本地队列为空，就会想其他的MP组合偷取一个可执行的G来执行；<br>4、一个M调度G执行的过程是一个循环机制；<br>5、当M执行某一个G时候如果发生了syscall或则其余阻塞操作，M会阻塞，如果当前有一些G在执行，runtime会把这个线程M从P中摘除(detach)，然后再创建一个新的操作系统的线程(如果有空闲的线程可用就复用空闲线程)来服务于这个P；<br>6、当M系统调用结束时候，这个G会尝试获取一个空闲的P执行，并放入到这个P的本地队列。如果获取不到P，那么这个线程M变成休眠状态， 加入到空闲线程中，然后这个G会被放入全局队列中。</p>
+<h5 id="4-调度器的生命周期"><a href="#4-调度器的生命周期" class="headerlink" title="(4)调度器的生命周期"></a>(4)调度器的生命周期</h5><p><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/17-pic-go%E8%B0%83%E5%BA%A6%E5%99%A8%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378443-5959b5ce-2f9d-4ea9-a1e9-af8b4d07f818.png#averageHue=%23100e0c&clientId=u6f8446ca-1d24-4&from=paste&id=ud9b1b9da&originHeight=872&originWidth=439&originalType=url&ratio=1&rotation=0&showTitle=false&size=63683&status=done&style=none&taskId=ua23ac074-082f-4e5f-984e-0dc2576b188&title=" alt="image.png"></a><br>特殊的M0和G0<br><strong>M0</strong><br>M0是启动程序后的编号为0的主线程，这个M对应的实例会在全局变量runtime.m0中，不需要在heap上分配，M0负责执行初始化操作和启动第一个G， 在之后M0就和其他的M一样了。<br><strong>G0</strong><br>G0是每次启动一个M都会第一个创建的 goroutine，G0仅用于负责调度的G，G0不指向任何可执行的函数, 每个M都会有一个自己的G0。在调度或系统调用时会使用G0的栈空间, 全局变量的G0是M0的G0。<br>我们来跟踪一段代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import &quot;fmt&quot;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    fmt.Println(&quot;Hello world&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来我们来针对上面的代码对调度器里面的结构做一个分析。<br>也会经历如上图所示的过程：</p>
+<ol>
+<li>runtime创建最初的线程m0和goroutine g0，并把2者关联。</li>
+<li>调度器初始化：初始化m0、栈、垃圾回收，以及创建和初始化由GOMAXPROCS个P构成的P列表。</li>
+<li>示例代码中的main函数是main.main，runtime中也有1个main函数——runtime.main，代码经过编译后，runtime.main会调用main.main，程序启动时会为runtime.main创建goroutine，称它为main goroutine吧，然后把main goroutine加入到P的本地队列。</li>
+<li>启动m0，m0已经绑定了P，会从P的本地队列获取G，获取到main goroutine。</li>
+<li>G拥有栈，M根据G中的栈信息和调度信息设置运行环境</li>
+<li>M运行G</li>
+<li>G退出，再次回到M获取可运行的G，这样重复下去，直到main.main退出，runtime.main执行Defer和Panic处理，或调用runtime.exit退出程序。</li>
+</ol>
+<p>调度器的生命周期几乎占满了一个Go程序的一生，runtime.main的goroutine执行之前都是为调度器做准备工作，runtime.main的goroutine运行，才是调度器的真正开始，直到runtime.main结束而结束。</p>
+<h5 id="5-可视化GMP编程"><a href="#5-可视化GMP编程" class="headerlink" title="(5)可视化GMP编程"></a>(5)可视化GMP编程</h5><p>有2种方式可以查看一个程序的GMP的数据。<br><strong>方式1：go tool trace</strong><br>trace记录了运行时的信息，能提供可视化的Web页面。<br>简单测试代码：main函数创建trace，trace会运行在单独的goroutine中，然后main打印”Hello World”退出。<br>trace.go</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;runtime/trace&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建trace文件</span></span><br><span class="line">    f, err := os.Create(<span class="string">&quot;trace.out&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">    <span class="comment">//启动trace goroutine</span></span><br><span class="line">    err = trace.Start(f)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> trace.Stop()</span><br><span class="line"></span><br><span class="line">    <span class="comment">//main</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Hello World&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行程序</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go run trace.go </span><br><span class="line">Hello World</span><br></pre></td></tr></table></figure>
+<p>会得到一个trace.out文件，然后我们可以用一个工具打开，来分析这个文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ go tool trace trace.out </span><br><span class="line">2020/02/23 10:44:11 Parsing trace...</span><br><span class="line">2020/02/23 10:44:11 Splitting trace...</span><br><span class="line">2020/02/23 10:44:11 Opening browser. Trace viewer is listening on http://127.0.0.1:33479</span><br></pre></td></tr></table></figure>
+<p>我们可以通过浏览器打开<a href="http://127.0.0.1:33479网址，点击view">http://127.0.0.1:33479网址，点击view</a> trace 能够看见可视化的调度流程。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/19-go-trace1.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529378468-f7be6d52-438b-4902-b7ea-cd6b41be38c9.png#averageHue=%23bbd8ab&clientId=u6f8446ca-1d24-4&from=paste&id=u11cf0f6b&originHeight=546&originWidth=2724&originalType=url&ratio=1&rotation=0&showTitle=false&size=82065&status=done&style=none&taskId=u89a4185d-933d-4e79-acfd-be58f94bfc0&title=" alt="image.png"></a><br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/20-go-trace2.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379036-d4524615-d54c-41bc-a674-e1f559b0a57b.png#averageHue=%23829283&clientId=u6f8446ca-1d24-4&from=paste&id=u038c10c1&originHeight=556&originWidth=492&originalType=url&ratio=1&rotation=0&showTitle=false&size=83539&status=done&style=none&taskId=u12285179-787a-4223-8637-c88f82b209e&title=" alt="image.png"></a><br><strong>G信息</strong><br>点击Goroutines那一行可视化的数据条，我们会看到一些详细的信息。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/20-go-trace3.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379481-6f9ead88-10b3-4e99-a49a-3706d5be3abe.png#averageHue=%23f6f0ed&clientId=u6f8446ca-1d24-4&from=paste&id=u5968a1ca&originHeight=372&originWidth=1168&originalType=url&ratio=1&rotation=0&showTitle=false&size=44555&status=done&style=none&taskId=u799bda80-a682-429b-b395-c13190ad717&title=" alt="image.png"></a><br>  一共有两个G在程序中，一个是特殊的G0，是每个M必须有的一个初始化的G，这个我们不必讨论。<br>其中G1应该就是main goroutine(执行main函数的协程)，在一段时间内处于可运行和运行的状态。<br><strong>M信息</strong><br>点击Threads那一行可视化的数据条，我们会看到一些详细的信息。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/22-go-trace4.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379633-10ac9720-9d28-469e-bdb7-369b5867de43.png#averageHue=%23f0eeec&clientId=u6f8446ca-1d24-4&from=paste&id=ub89fe639&originHeight=248&originWidth=1146&originalType=url&ratio=1&rotation=0&showTitle=false&size=27256&status=done&style=none&taskId=ua5d1fb5a-59d0-4f6a-bfc1-3e510cc72d8&title=" alt="image.png"></a><br>一共有两个M在程序中，一个是特殊的M0，用于初始化使用，这个我们不必讨论。<br><strong>P信息</strong><br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/23-go-trace5.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379675-23843feb-d9c7-4060-937d-8e20d10a1730.png#averageHue=%23f1f1f1&clientId=u6f8446ca-1d24-4&from=paste&id=u2b731b75&originHeight=224&originWidth=2736&originalType=url&ratio=1&rotation=0&showTitle=false&size=31401&status=done&style=none&taskId=udcc4e760-6d99-429f-92b3-3e1bd87031a&title=" alt="image.png"></a><br>G1中调用了main.main，创建了trace goroutine g18。G1运行在P1上，G18运行在P0上。<br>这里有两个P，我们知道，一个P必须绑定一个M才能调度G。<br>我们在来看看上面的M信息。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/24-go-trace6.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529379861-1fe02195-177c-4d7f-865b-c4105ded978b.png#averageHue=%23aacf98&clientId=u6f8446ca-1d24-4&from=paste&id=u23dfeefc&originHeight=466&originWidth=2142&originalType=url&ratio=1&rotation=0&showTitle=false&size=85902&status=done&style=none&taskId=u47952663-d7d5-414c-aa31-ea2d6af8350&title=" alt="image.png"></a><br>我们会发现，确实G18在P0上被运行的时候，确实在Threads行多了一个M的数据，点击查看如下：<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/25-go-trace7.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529380079-308a534f-0451-4e4d-9f3d-4a4008cf7d4e.png#averageHue=%23f1f0ee&clientId=u6f8446ca-1d24-4&from=paste&id=u42795447&originHeight=298&originWidth=1086&originalType=url&ratio=1&rotation=0&showTitle=false&size=29398&status=done&style=none&taskId=u7afef279-4538-435e-a3ee-ab333448f85&title=" alt="image.png"></a><br>多了一个M2应该就是P0为了执行G18而动态创建的M2.<br><strong>方式2：Debug trace</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">5</span>; i++ &#123;</span><br><span class="line">        time.Sleep(time.Second)</span><br><span class="line">        fmt.Println(<span class="string">&quot;Hello World&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译<br>$ go build trace2.go<br>通过Debug方式运行</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ GODEBUG=schedtrace=<span class="number">1000</span> ./trace2 </span><br><span class="line">SCHED <span class="number">0</span>ms: gomaxprocs=<span class="number">2</span> idleprocs=<span class="number">0</span> threads=<span class="number">4</span> spinningthreads=<span class="number">1</span> idlethreads=<span class="number">1</span> runqueue=<span class="number">0</span> [<span class="number">0</span> <span class="number">0</span>]</span><br><span class="line">Hello World</span><br><span class="line">SCHED <span class="number">1003</span>ms: gomaxprocs=<span class="number">2</span> idleprocs=<span class="number">2</span> threads=<span class="number">4</span> spinningthreads=<span class="number">0</span> idlethreads=<span class="number">2</span> runqueue=<span class="number">0</span> [<span class="number">0</span> <span class="number">0</span>]</span><br><span class="line">Hello World</span><br><span class="line">SCHED <span class="number">2014</span>ms: gomaxprocs=<span class="number">2</span> idleprocs=<span class="number">2</span> threads=<span class="number">4</span> spinningthreads=<span class="number">0</span> idlethreads=<span class="number">2</span> runqueue=<span class="number">0</span> [<span class="number">0</span> <span class="number">0</span>]</span><br><span class="line">Hello World</span><br><span class="line">SCHED <span class="number">3015</span>ms: gomaxprocs=<span class="number">2</span> idleprocs=<span class="number">2</span> threads=<span class="number">4</span> spinningthreads=<span class="number">0</span> idlethreads=<span class="number">2</span> runqueue=<span class="number">0</span> [<span class="number">0</span> <span class="number">0</span>]</span><br><span class="line">Hello World</span><br><span class="line">SCHED <span class="number">4023</span>ms: gomaxprocs=<span class="number">2</span> idleprocs=<span class="number">2</span> threads=<span class="number">4</span> spinningthreads=<span class="number">0</span> idlethreads=<span class="number">2</span> runqueue=<span class="number">0</span> [<span class="number">0</span> <span class="number">0</span>]</span><br><span class="line">Hello World</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SCHED：调试信息输出标志字符串，代表本行是goroutine调度器的输出；</li>
+<li>0ms：即从程序启动到输出这行日志的时间；</li>
+<li>gomaxprocs: P的数量，本例有2个P, 因为默认的P的属性是和cpu核心数量默认一致，当然也可以通过GOMAXPROCS来设置；</li>
+<li>idleprocs: 处于idle状态的P的数量；通过gomaxprocs和idleprocs的差值，我们就可知道执行go代码的P的数量；</li>
+<li>threads: os threads&#x2F;M的数量，包含scheduler使用的m数量，加上runtime自用的类似sysmon这样的thread的数量；</li>
+<li>spinningthreads: 处于自旋状态的os thread数量；</li>
+<li>idlethread: 处于idle状态的os thread的数量；</li>
+<li>runqueue&#x3D;0： Scheduler全局队列中G的数量；</li>
+<li>[0 0]: 分别为2个P的local queue中的G的数量。</li>
+</ul>
+<p>下一篇，我们来继续详细的分析GMP调度原理的一些场景问题。</p>
+<h4 id="三、Go调度器调度场景过程全解析"><a href="#三、Go调度器调度场景过程全解析" class="headerlink" title="三、Go调度器调度场景过程全解析"></a>三、Go调度器调度场景过程全解析</h4><h5 id="1-场景1"><a href="#1-场景1" class="headerlink" title="(1)场景1"></a>(1)场景1</h5><p>P拥有G1，M1获取P后开始运行G1，G1使用go func()创建了G2，为了局部性G2优先加入到P1的本地队列。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/26-gmp%E5%9C%BA%E6%99%AF1.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529380605-fcefc64d-dc0c-4481-bd62-08a95f556748.png#averageHue=%23fdfcfa&clientId=u6f8446ca-1d24-4&from=paste&id=u6614e348&originHeight=900&originWidth=1074&originalType=url&ratio=1&rotation=0&showTitle=false&size=134869&status=done&style=none&taskId=u963e7269-f970-4578-8456-a8dfa1584fe&title=" alt="image.png"></a></p>
+<hr>
+<h5 id="2-场景2"><a href="#2-场景2" class="headerlink" title="(2)场景2"></a>(2)场景2</h5><p>G1运行完成后(函数：goexit)，M上运行的goroutine切换为G0，G0负责调度时协程的切换（函数：schedule）。从P的本地队列取G2，从G0切换到G2，并开始运行G2(函数：execute)。实现了线程M1的复用。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/27-gmp%E5%9C%BA%E6%99%AF2.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381153-96edc495-2ac9-4172-af1f-a5145f454f5d.png#averageHue=%23fafaf8&clientId=u6f8446ca-1d24-4&from=paste&id=ua9808857&originHeight=454&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=75060&status=done&style=none&taskId=u616f9fe7-911b-4ed7-991b-d25c0586655&title=" alt="image.png"></a></p>
+<hr>
+<h5 id="3-场景3"><a href="#3-场景3" class="headerlink" title="(3)场景3"></a>(3)场景3</h5><p>假设每个P的本地队列只能存3个G。G2要创建了6个G，前3个G（G3, G4, G5）已经加入p1的本地队列，p1本地队列满了。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/28-gmp%E5%9C%BA%E6%99%AF3.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381159-e73861ee-71d2-4ca5-89a7-48e5e5016b44.png#averageHue=%23fbfaf9&clientId=u6f8446ca-1d24-4&from=paste&id=u59763891&originHeight=700&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=117266&status=done&style=none&taskId=u96b043a7-f124-40b2-9f26-c5774335c55&title=" alt="image.png"></a></p>
+<hr>
+<h5 id="4-场景4"><a href="#4-场景4" class="headerlink" title="(4)场景4"></a>(4)场景4</h5><p>G2在创建G7的时候，发现P1的本地队列已满，需要执行<strong>负载均衡</strong>(把P1中本地队列中前一半的G，还有新创建G<strong>转移</strong>到全局队列)<br>（实现中并不一定是新的G，如果G是G2之后就执行的，会被保存在本地队列，利用某个老的G替换新G加入全局队列）<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/29-gmp%E5%9C%BA%E6%99%AF4.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381222-beafc2d4-6a09-4729-b1ef-b32beda8f692.png#averageHue=%23faf9f8&clientId=u6f8446ca-1d24-4&from=paste&id=u7764d999&originHeight=715&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=151013&status=done&style=none&taskId=u739fd904-9cb0-42b2-96b5-a03356b4252&title=" alt="image.png"></a><br>这些G被转移到全局队列时，会被打乱顺序。所以G3,G4,G7被转移到全局队列。</p>
+<hr>
+<h5 id="5-场景5"><a href="#5-场景5" class="headerlink" title="(5)场景5"></a>(5)场景5</h5><p>G2创建G8时，P1的本地队列未满，所以G8会被加入到P1的本地队列。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/30-gmp%E5%9C%BA%E6%99%AF5.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381242-d33e0861-8b2d-4d3c-9ccd-ca0be345bf8c.png#averageHue=%23fbfaf9&clientId=u6f8446ca-1d24-4&from=paste&id=ue67bc4a9&originHeight=759&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=144078&status=done&style=none&taskId=u1224241c-2d08-40bb-8a2b-6e317da3784&title=" alt="image.png"></a><br>G8加入到P1点本地队列的原因还是因为P1此时在与M1绑定，而G2此时是M1在执行。所以G2创建的新的G会优先放置到自己的M绑定的P上。</p>
+<hr>
+<h5 id="6-场景6"><a href="#6-场景6" class="headerlink" title="(6)场景6"></a>(6)场景6</h5><p>规定：<strong>在创建G时，运行的G会尝试唤醒其他空闲的P和M组合去执行</strong>。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/31-gmp%E5%9C%BA%E6%99%AF6.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529381714-b2a0b647-d787-4479-9385-9872795e44cf.png#averageHue=%23fbfbf9&clientId=u6f8446ca-1d24-4&from=paste&id=u9b2a116e&originHeight=417&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=81129&status=done&style=none&taskId=uc4e1776f-752b-4b02-93cb-d0ac2afdbb4&title=" alt="image.png"></a><br>假定G2唤醒了M2，M2绑定了P2，并运行G0，但P2本地队列没有G，M2此时为自旋线程<strong>（没有G但为运行状态的线程，不断寻找G）</strong>。</p>
+<hr>
+<h5 id="7-场景7"><a href="#7-场景7" class="headerlink" title="(7)场景7"></a>(7)场景7</h5><p>M2尝试从全局队列(简称“GQ”)取一批G放到P2的本地队列（函数：findrunnable()）。M2从全局队列取的G数量符合下面的公式：<br>n &#x3D; min(len(GQ)&#x2F;GOMAXPROCS + 1, len(GQ&#x2F;2))<br>至少从全局队列取1个g，但每次不要从全局队列移动太多的g到p本地队列，给其他p留点。这是<strong>从全局队列到P本地队列的负载均衡</strong>。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/32-gmp%E5%9C%BA%E6%99%AF7.001.jpeg"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529382326-69796520-9e6e-4801-be2a-dcd815b58496.png#averageHue=%23f8f7f4&clientId=u6f8446ca-1d24-4&from=paste&id=ua0c6f3ce&originHeight=422&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=154360&status=done&style=none&taskId=u26b49b83-a512-47ca-a598-901ddf8ed0c&title=" alt="image.png"></a><br>假定我们场景中一共有4个P（GOMAXPROCS设置为4，那么我们允许最多就能用4个P来供M使用）。所以M2只从能从全局队列取1个G（即G3）移动P2本地队列，然后完成从G0到G3的切换，运行G3。</p>
+<hr>
+<h5 id="8-场景8"><a href="#8-场景8" class="headerlink" title="(8)场景8"></a>(8)场景8</h5><p>假设G2一直在M1上运行，经过2轮后，M2已经把G7、G4从全局队列获取到了P2的本地队列并完成运行，全局队列和P2的本地队列都空了,如场景8图的左半部分。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/33-gmp%E5%9C%BA%E6%99%AF8.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529382411-546914f9-80f0-464c-8a7d-d56d07878cfb.png#averageHue=%23faf9f7&clientId=u6f8446ca-1d24-4&from=paste&id=u09e19a32&originHeight=519&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=102850&status=done&style=none&taskId=u48e33609-bea1-4d0b-a9dc-6750497901a&title=" alt="image.png"></a><br><strong>全局队列已经没有G，那m就要执行work stealing(偷取)：从其他有G的P哪里偷取一半G过来，放到自己的P本地队列</strong>。P2从P1的本地队列尾部取一半的G，本例中一半则只有1个G8，放到P2的本地队列并执行。</p>
+<hr>
+<h5 id="9-场景9"><a href="#9-场景9" class="headerlink" title="(9)场景9"></a>(9)场景9</h5><p>G1本地队列G5、G6已经被其他M偷走并运行完成，当前M1和M2分别在运行G2和G8，M3和M4没有goroutine可以运行，M3和M4处于<strong>自旋状态</strong>，它们不断寻找goroutine。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/34-gmp%E5%9C%BA%E6%99%AF9.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529382519-5a37aba8-95b4-465f-b26e-14c81cfdcffd.png#averageHue=%23faf8f6&clientId=u6f8446ca-1d24-4&from=paste&id=u3ecba128&originHeight=483&originWidth=750&originalType=url&ratio=1&rotation=0&showTitle=false&size=118428&status=done&style=none&taskId=ue2d060c6-9724-4e25-9049-db4f149b151&title=" alt="image.png"></a><br>为什么要让m3和m4自旋，自旋本质是在运行，线程在运行却没有执行G，就变成了浪费CPU. 为什么不销毁现场，来节约CPU资源。因为创建和销毁CPU也会浪费时间，我们<strong>希望当有新goroutine创建时，立刻能有M运行它</strong>，如果销毁再新建就增加了时延，降低了效率。当然也考虑了过多的自旋线程是浪费CPU，所以系统中最多有GOMAXPROCS个自旋的线程(当前例子中的GOMAXPROCS&#x3D;4，所以一共4个P)，多余的没事做线程会让他们休眠。</p>
+<hr>
+<h5 id="10-场景10"><a href="#10-场景10" class="headerlink" title="(10)场景10"></a>(10)场景10</h5><p>假定当前除了M3和M4为自旋线程，还有M5和M6为空闲的线程(没有得到P的绑定，注意我们这里最多就只能够存在4个P，所以P的数量应该永远是M&gt;&#x3D;P, 大部分都是M在抢占需要运行的P)，G8创建了G9，G8进行了<strong>阻塞的系统调用</strong>，M2和P2立即解绑，P2会执行以下判断：如果P2本地队列有G、全局队列有G或有空闲的M，P2都会立马唤醒1个M和它绑定，否则P2则会加入到空闲P列表，等待M来获取可用的p。本场景中，P2本地队列有G9，可以和其他空闲的线程M5绑定。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/35-gmp%E5%9C%BA%E6%99%AF10.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529383098-da914ca4-5731-4860-9654-af4accbdfdcb.png#averageHue=%23f9f7f3&clientId=u6f8446ca-1d24-4&from=paste&id=uc5df4134&originHeight=498&originWidth=880&originalType=url&ratio=1&rotation=0&showTitle=false&size=139921&status=done&style=none&taskId=uea43a925-17ed-4e1e-af7c-31eada75e97&title=" alt="image.png"></a></p>
+<h5 id="11-场景11"><a href="#11-场景11" class="headerlink" title="(11)场景11"></a>(11)场景11</h5><p>G8创建了G9，假如G8进行了<strong>非阻塞系统调用</strong>。<br><a target="_blank" rel="noopener" href="https://novnan.github.io/images/GO/Golang%E7%9A%84%E5%8D%8F%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86%E5%8F%8AGMP%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/36-gmp%E5%9C%BA%E6%99%AF11.png"><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1683529383019-ecaee668-7b20-40f9-98e0-c261889dd704.png#averageHue=%23f8f8f6&clientId=u6f8446ca-1d24-4&from=paste&id=u459c5bc0&originHeight=488&originWidth=892&originalType=url&ratio=1&rotation=0&showTitle=false&size=125365&status=done&style=none&taskId=u9d05eee3-08ae-4a96-9d14-f1d59beca8b&title=" alt="image.png"></a><br>M2和P2会解绑，但M2会记住P2，然后G8和M2进入<strong>系统调用</strong>状态。当G8和M2退出系统调用时，会尝试获取P2，如果无法获取，则获取空闲的P，如果依然没有，G8会被记为可运行状态，并加入到全局队列,M2因为没有P的绑定而变成休眠状态(长时间休眠等待GC回收销毁)。</p>
+<hr>
+<h4 id="四、小结"><a href="#四、小结" class="headerlink" title="四、小结"></a>四、小结</h4><p>总结，Go调度器很轻量也很简单，足以撑起goroutine的调度工作，并且让Go具有了原生（强大）并发的能力。<strong>Go调度本质是把大量的goroutine分配到少量线程上去执行，并利用多核并行，实现更强大的并发。</strong></p>
+
+        
+      </div>
+
+         
+    </div>
+    
+     
+  </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left "
+    
+      href="/2023/02/18/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"
+      title="内存分配"
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+      
+        内存分配
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right  disabled "
+     >
+
+    <p class="title-text">
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+  
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <div id="comment-card" class="comment-card">
+    <div class="main-title-bar">
+      <div class="main-title-dot"></div>
+      <div class="main-title">留言 </div>
+    </div>
+    <div id="vcomments"></div>
+  </div>
+  <script>
+      new Valine({"enable":true,"appId":"LKrpqiXJrQY3ZkCCZ4nZ74BD-gzGzoHsz","appKey":"3JjUeFXXRTKbLQYsjTFTZ1fc","placeholder":"Just go go","pageSize":10,"highlight":true,"serverURLs":null,"el":"#vcomments"});
+  </script>
+ 
+    </div>
+    <div id="footer-wrapper">
+      <footer id="footer">
+  
+  <div id="footer-info" class="inner">
+    
+    &copy; 2023 GoIruri<br>
+    Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
+  </div>
+</footer>
+
+    </div>
+    <div class="back-to-top-wrapper">
+    <button id="back-to-top-btn" class="back-to-top-btn hide" onclick="topFunction()">
+        <i class="fa-solid fa-angle-up"></i>
+    </button>
+</div>
+
+<script>
+    function topFunction() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    let btn = document.getElementById('back-to-top-btn');
+    function scrollFunction() {
+        if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+            btn.classList.remove('hide')
+        } else {
+            btn.classList.add('hide')
+        }
+    }
+    window.onscroll = function() {
+        scrollFunction();
+    }
+</script>
+
+  </div>
+  <script src="/js/light-dark-switch.js"></script>
+</body>
+</html>
