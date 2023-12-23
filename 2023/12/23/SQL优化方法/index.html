@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+
+<html theme="dark" showBanner="true" hasBanner="true" > 
+<link href="/fontawesome/css/fontawesome.css" rel="stylesheet">
+<link href="/fontawesome/css/brands.css" rel="stylesheet">
+<link href="/fontawesome/css/solid.css" rel="stylesheet">
+<script src="/js/color.global.min.js" ></script>
+<script src="/js/load-settings.js" ></script>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+
+  
+  <title>SQL优化方法 | GoIruri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+  <meta name="description" content="sql优化是一个大家都比较关注的热门话题，无论你在面试，还是工作中，都很有可能会遇到。如果某天你负责的某个线上接口，出现了性能问题，需要做优化。那么你首先想到的很有可能是优化sql语句，因为它的改造成本相对于代码来说也要小得多。那么，如何优化sql语句呢？这篇文章从15个方面，分享了sql优化的一些小技巧，希望对你有所帮助。 1 避免使用select *很多时候，我们写sql语句时，为了方便，喜欢">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL优化方法">
+<meta property="og:url" content="http://example.com/2023/12/23/SQL%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="GoIruri">
+<meta property="og:description" content="sql优化是一个大家都比较关注的热门话题，无论你在面试，还是工作中，都很有可能会遇到。如果某天你负责的某个线上接口，出现了性能问题，需要做优化。那么你首先想到的很有可能是优化sql语句，因为它的改造成本相对于代码来说也要小得多。那么，如何优化sql语句呢？这篇文章从15个方面，分享了sql优化的一些小技巧，希望对你有所帮助。 1 避免使用select *很多时候，我们写sql语句时，为了方便，喜欢">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422189-fdf7440b-a475-4092-852e-fda43d5c16fd.jpeg#averageHue=%23f7f6f6&clientId=u21a2e1b2-9e8b-4&from=paste&id=u1f449a65&originHeight=1074&originWidth=746&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u5f46cc64-f89b-4acc-be5c-dcb0e74e9e8&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422289-c0ee9703-d89b-48c0-b3aa-b33ae07b09dd.jpeg#averageHue=%23f9f4f3&clientId=u21a2e1b2-9e8b-4&from=paste&id=u418eb4fd&originHeight=77&originWidth=1080&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u6e2d063a-5b70-4cf3-97ac-6485f33d3dd&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422640-f8a2c456-5724-4056-beb5-d3132319253a.jpeg#averageHue=%23bee4e2&clientId=u21a2e1b2-9e8b-4&from=paste&id=u4ffd814f&originHeight=1024&originWidth=920&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u487188a8-917a-4910-836f-518febbed2b&title=">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422292-6fa46323-52ba-4a00-9bf5-6373392fe97d.jpeg#averageHue=%23f7f7f6&clientId=u21a2e1b2-9e8b-4&from=paste&id=ud0c247dc&originHeight=770&originWidth=1080&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=ube96bb44-df00-4efe-960a-31546e31471&title=">
+<meta property="article:published_time" content="2023-12-23T05:09:25.167Z">
+<meta property="article:modified_time" content="2023-12-23T05:11:01.625Z">
+<meta property="article:author" content="GoIruri">
+<meta property="article:tag" content="工程实践">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422189-fdf7440b-a475-4092-852e-fda43d5c16fd.jpeg#averageHue=%23f7f6f6&clientId=u21a2e1b2-9e8b-4&from=paste&id=u1f449a65&originHeight=1074&originWidth=746&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u5f46cc64-f89b-4acc-be5c-dcb0e74e9e8&title=">
+  
+    <link rel="alternate" href="/atom.xml" title="GoIruri" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/images/avator.jpg">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+<body>
+  
+  
+    
+<div id="banner" class="">
+  <img src="/images/back.png" itemprop="image">
+  <div id="banner-dim"></div>
+</div>
+ 
+   
+  <div id="main-grid" class="shadow   ">
+    <div id="nav" class=""  >
+      <navbar id="navbar">
+  <nav id="title-nav">
+    <a href="/">
+      <div id="vivia-logo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div>GoIruri </div>
+    </a>
+  </nav>
+  <nav id="main-nav">
+    
+      <a class="main-nav-link" href="/">Home</a>
+    
+      <a class="main-nav-link" href="/archives">Archives</a>
+    
+      <a class="main-nav-link" href="/about">About</a>
+    
+  </nav>
+  <nav id="sub-nav">
+    <a id="theme-btn" class="nav-icon">
+      <span class="light-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M438.5-829.913v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-829.913Zm0 747.826v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-82.087ZM877.913-438.5h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537t29.476-12.174h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T877.913-438.5Zm-747.826 0h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T82.087-521.5h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T130.087-438.5Zm660.174-290.87-34.239 32q-12.913 12.674-29.565 12.174-16.653-.5-29.327-13.174-12.674-12.673-12.554-28.826.12-16.152 12.794-28.826l33-35q12.913-12.674 30.454-12.674t30.163 12.847q12.709 12.846 12.328 30.826-.38 17.98-13.054 30.653ZM262.63-203.978l-32 34q-12.913 12.674-30.454 12.674t-30.163-12.847q-12.709-12.846-12.328-30.826.38-17.98 13.054-30.653l33.239-31q12.913-12.674 29.565-12.174 16.653.5 29.327 13.174 12.674 12.673 12.554 28.826-.12 16.152-12.794 28.826Zm466.74 33.239-32-33.239q-12.674-12.913-12.174-29.565.5-16.653 13.174-29.327 12.673-12.674 28.826-13.054 16.152-.38 28.826 12.294l35 33q12.674 12.913 12.674 30.454t-12.847 30.163q-12.846 12.709-30.826 12.328-17.98-.38-30.653-13.054ZM203.978-697.37l-34-33q-12.674-12.913-13.174-29.945-.5-17.033 12.174-29.707t31.326-13.293q18.653-.62 31.326 13.054l32 34.239q11.674 12.913 11.174 29.565-.5 16.653-13.174 29.327-12.673 12.674-28.826 12.554-16.152-.12-28.826-12.794ZM480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm-.247-82q65.703 0 111.475-46.272Q637-414.544 637-480.247t-45.525-111.228Q545.95-637 480.247-637t-111.475 45.525Q323-545.95 323-480.247t45.525 111.975Q414.05-322 479.753-322ZM481-481Z"/></svg></span>
+      <span class="dark-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480.239-116.413q-152.63 0-258.228-105.478Q116.413-327.37 116.413-480q0-130.935 77.739-227.435t206.304-125.043q43.022-9.631 63.87 10.869t3.478 62.805q-8.891 22.043-14.315 44.463-5.424 22.42-5.424 46.689 0 91.694 64.326 155.879 64.325 64.186 156.218 64.186 24.369 0 46.978-4.946 22.609-4.945 44.413-14.076 42.826-17.369 62.967 1.142 20.142 18.511 10.511 61.054Q807.174-280 712.63-198.206q-94.543 81.793-232.391 81.793Zm0-95q79.783 0 143.337-40.217 63.554-40.218 95.793-108.283-15.608 4.044-31.097 5.326-15.49 1.283-31.859.805-123.706-4.066-210.777-90.539-87.071-86.473-91.614-212.092-.24-16.369.923-31.978 1.164-15.609 5.446-30.978-67.826 32.478-108.282 96.152Q211.652-559.543 211.652-480q0 111.929 78.329 190.258 78.329 78.329 190.258 78.329ZM466.13-465.891Z"/></svg></span>
+    </a>
+    
+      <a id="nav-rss-link" class="nav-icon mobile-hide" href="/atom.xml" title="RSS 订阅">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M198-120q-25.846 0-44.23-18.384-18.384-18.385-18.384-44.23 0-25.846 18.384-44.23 18.384-18.385 44.23-18.385 25.846 0 44.23 18.385 18.384 18.384 18.384 44.23 0 25.845-18.384 44.23Q223.846-120 198-120Zm538.385 0q-18.846 0-32.923-13.769-14.076-13.769-15.922-33.23-8.692-100.616-51.077-188.654-42.385-88.039-109.885-155.539-67.5-67.501-155.539-109.885Q283-663.462 182.385-672.154q-19.461-1.846-33.23-16.23-13.769-14.385-13.769-33.846t14.076-32.922q14.077-13.461 32.923-12.23 120.076 8.692 226.038 58.768 105.961 50.077 185.73 129.846 79.769 79.769 129.846 185.731 50.077 105.961 58.769 226.038 1.231 18.846-12.538 32.922Q756.461-120 736.385-120Zm-252 0q-18.231 0-32.423-13.461t-18.653-33.538Q418.155-264.23 348.886-333.5q-69.27-69.27-166.501-84.423-20.077-4.462-33.538-18.961-13.461-14.5-13.461-33.346 0-19.076 13.884-33.23 13.884-14.153 33.115-10.922 136.769 15.384 234.384 112.999 97.615 97.615 112.999 234.384 3.231 19.23-10.538 33.115Q505.461-120 484.385-120Z"/></svg>
+      </a>
+    
+    <div id="nav-menu-btn" class="nav-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M177.37-252.282q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Zm0-186.218q-17.453 0-29.477-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T177.37-521.5h605.26q17.453 0 29.477 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T782.63-438.5H177.37Zm0-186.217q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Z"/></svg>
+    </div>
+  </nav>
+</navbar>
+<div id="nav-dropdown" class="hidden">
+  <div id="dropdown-link-list">
+    
+      <a class="nav-dropdown-link" href="/">Home</a>
+    
+      <a class="nav-dropdown-link" href="/archives">Archives</a>
+    
+      <a class="nav-dropdown-link" href="/about">About</a>
+    
+    
+      <a class="nav-dropdown-link" href="/atom.xml" title="RSS 订阅">RSS</a>
+     
+    </div>
+</div>
+<script>
+  let dropdownBtn = document.getElementById("nav-menu-btn");
+  let dropdownEle = document.getElementById("nav-dropdown");
+  dropdownBtn.onclick = function() {
+    dropdownEle.classList.toggle("hidden");
+  }
+</script>
+    </div>
+    <div id="sidebar-wrapper">
+      <sidebar id="sidebar">
+  
+    <div class="widget-wrap">
+  <div class="info-card">
+    <div class="avatar">
+      
+        <image src=/images/avator.jpg></image>
+      
+      <div class="img-dim"></div>
+    </div>
+    <div class="info">
+      <div class="username">GoIruri </div>
+      <div class="dot"></div>
+      <div class="subtitle">某不知名黑客 </div>
+      <div class="link-list">
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://twitter.com" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://store.steampowered.com" title="Steam"><i class="fa-brands fa-steam"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://github.com/GoIruri" title="GitHub"><i class="fa-brands fa-github"></i></a>
+         
+      </div>  
+    </div>
+  </div>
+</div>
+
+  
+  <div class="sticky">
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">标签</h3>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E4%BC%98%E5%8C%96/" rel="tag">优化</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%86%85%E5%AD%98/" rel="tag">内存</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag">内存管理</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" rel="tag">工程实践</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag">并发</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" rel="tag">类型转换</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%BC%96%E8%AF%91/" rel="tag">编译</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">归档</h3>
+      
+      
+        <a class="archive-link" href="/archives/2023/12 ">
+          十二月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/11 ">
+          十一月 2023 
+          <div class="archive-count">6 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/06 ">
+          六月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/04 ">
+          四月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/03 ">
+          三月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/02 ">
+          二月 2023 
+          <div class="archive-count">3 </div>
+        </a>
+      
+        <a class="archive-link" href="/archives/2023/01 ">
+          一月 2023 
+          <div class="archive-count">1 </div>
+        </a>
+      
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">最新文章</h3>
+      <ul>
+        
+          <a class="recent-link" href="/2023/12/23/SQL%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/" title="SQL优化方法" >
+            <div class="recent-link-text">
+              SQL优化方法
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7-wire/" title="依赖注入wire" >
+            <div class="recent-link-text">
+              依赖注入wire
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/Weblogic%20JNDI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90%E5%8F%8A%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/" title="CVE-2023-21931" >
+            <div class="recent-link-text">
+              CVE-2023-21931
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="IO多路复用" >
+            <div class="recent-link-text">
+              IO多路复用
+            </div>
+          </a>
+        
+          <a class="recent-link" href="/2023/11/05/SingleFlight/" title="SigleFlight" >
+            <div class="recent-link-text">
+              SigleFlight
+            </div>
+          </a>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+  </div>
+</sidebar>
+    </div>
+    <div id="content-body">
+      <meta name="referrer" content="no-referrer" />
+ 
+
+<article id="post-SQL优化方法" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        SQL优化方法
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-12-23T05:09:25.167Z" itemprop="datePublished">2023-12-23</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/MySQL/">MySQL</a>><a class="meta-cate-link" href="/categories/MySQL/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/">工程实践</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            4.6k 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" rel="tag">工程实践</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <p>sql优化是一个大家都比较关注的热门话题，无论你在面试，还是工作中，都很有可能会遇到。<br>如果某天你负责的某个线上接口，出现了性能问题，需要做优化。那么你首先想到的很有可能是优化sql语句，因为它的改造成本相对于代码来说也要小得多。<br>那么，如何优化sql语句呢？<br>这篇文章从15个方面，分享了sql优化的一些小技巧，希望对你有所帮助。<br><img src="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422189-fdf7440b-a475-4092-852e-fda43d5c16fd.jpeg#averageHue=%23f7f6f6&clientId=u21a2e1b2-9e8b-4&from=paste&id=u1f449a65&originHeight=1074&originWidth=746&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u5f46cc64-f89b-4acc-be5c-dcb0e74e9e8&title="></p>
+<h2 id="1-避免使用select"><a href="#1-避免使用select" class="headerlink" title="1 避免使用select *"></a>1 避免使用select *</h2><p>很多时候，我们写sql语句时，为了方便，喜欢直接使用select *，一次性查出表中所有列的数据。<br><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>在实际业务场景中，可能我们真正需要使用的只有其中一两列。查了很多数据，但是不用，白白浪费了数据库资源，比如：内存或者cpu。<br>此外，多查出来的数据，通过网络IO传输的过程中，也会增加数据传输的时间。<br>还有一个重要的问题是：select *不会走覆盖索引，会出现大量的回表操作，而从导致查询sql的性能很低。<br>那么，如何优化呢？<br><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> name,age <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>sql语句查询时，只查需要用到的列，多余的列根本无需查出来。</p>
+<h2 id="2-用union-all代替union"><a href="#2-用union-all代替union" class="headerlink" title="2 用union all代替union"></a>2 用union all代替union</h2><p>我们都知道sql语句使用union关键字后，可以获取排重后的数据。<br>而如果使用union all关键字，可以获取所有数据，包含重复的数据。<br><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">1</span>) </span><br><span class="line"><span class="keyword">union</span> </span><br><span class="line">(<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<p>排重的过程需要遍历、排序和比较，它更耗时，更消耗cpu资源。<br>所以如果能用union all的时候，尽量不用union。<br><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">1</span>) </span><br><span class="line"><span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line">(<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<p>除非是有些特殊的场景，比如union all之后，结果集中出现了重复数据，而业务场景中是不允许产生重复数据的，这时可以使用union。</p>
+<h2 id="3-小表驱动大表"><a href="#3-小表驱动大表" class="headerlink" title="3 小表驱动大表"></a>3 小表驱动大表</h2><p>小表驱动大表，也就是说用小表的数据集驱动大表的数据集。<br>假如有order和user两张表，其中order表有10000条数据，而user表有100条数据。<br>这时如果想查一下，所有有效的用户下过的订单列表。<br>可以使用in关键字实现：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="keyword">in</span> (<span class="keyword">select</span> id <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> status<span class="operator">=</span><span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>也可以使用exists关键字实现：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> <span class="keyword">exists</span> (<span class="keyword">select</span> <span class="number">1</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> order.user_id <span class="operator">=</span> user.id <span class="keyword">and</span> status<span class="operator">=</span><span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>前面提到的这种业务场景，使用in关键字去实现业务需求，更加合适。<br>为什么呢？<br>因为如果sql语句中包含了in关键字，则它会优先执行in里面的子查询语句，然后再执行in外面的语句。如果in里面的数据量很少，作为条件查询速度更快。<br>而如果sql语句中包含了exists关键字，它优先执行exists左边的语句（即主查询语句）。然后把它作为条件，去跟右边的语句匹配。如果匹配上，则可以查询出数据。如果匹配不上，数据就被过滤掉了。<br>这个需求中，order表有10000条数据，而user表有100条数据。order表是大表，user表是小表。如果order表在左边，则用in关键字性能更好。<br>总结一下：</p>
+<ul>
+<li>in 适用于左边大表，右边小表。</li>
+<li>exists 适用于左边小表，右边大表。</li>
+</ul>
+<p>不管是用in，还是exists关键字，其核心思想都是用小表驱动大表。</p>
+<h2 id="4-批量操作"><a href="#4-批量操作" class="headerlink" title="4 批量操作"></a>4 批量操作</h2><p>如果你有一批数据经过业务处理之后，需要插入数据，该怎么办？<br><strong>反例：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(Order order: list)&#123;</span><br><span class="line">    orderMapper.insert(order):</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在循环中逐条插入数据。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">order</span>(id,code,user_id) </span><br><span class="line"><span class="keyword">values</span>(<span class="number">123</span>,<span class="string">&#x27;001&#x27;</span>,<span class="number">100</span>);</span><br></pre></td></tr></table></figure>
+<p>该操作需要多次请求数据库，才能完成这批数据的插入。<br>但众所周知，我们在代码中，每次远程请求数据库，是会消耗一定性能的。而如果我们的代码需要请求多次数据库，才能完成本次业务功能，势必会消耗更多的性能。<br>那么如何优化呢？<br><strong>正例：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">orderMapper.insertBatch(list):</span><br></pre></td></tr></table></figure>
+<p>提供一个批量插入数据的方法。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">order</span>(id,code,user_id) </span><br><span class="line"><span class="keyword">values</span>(<span class="number">123</span>,<span class="string">&#x27;001&#x27;</span>,<span class="number">100</span>),(<span class="number">124</span>,<span class="string">&#x27;002&#x27;</span>,<span class="number">100</span>),(<span class="number">125</span>,<span class="string">&#x27;003&#x27;</span>,<span class="number">101</span>);</span><br></pre></td></tr></table></figure>
+<p>这样只需要远程请求一次数据库，sql性能会得到提升，数据量越多，提升越大。<br>但需要注意的是，不建议一次批量操作太多的数据，如果数据太多数据库响应也会很慢。批量操作需要把握一个度，建议每批数据尽量控制在500以内。如果数据多于500，则分多批次处理。</p>
+<h2 id="5-多用limit"><a href="#5-多用limit" class="headerlink" title="5 多用limit"></a>5 多用limit</h2><p>有时候，我们需要查询某些数据中的条，比如：查询某个用户下的个订单，想看看他次的首单时间。<br><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id, create_date </span><br><span class="line"> <span class="keyword">from</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">where</span> user_id<span class="operator">=</span><span class="number">123</span> </span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> create_date <span class="keyword">asc</span>;</span><br></pre></td></tr></table></figure>
+<p>根据用户id查询订单，按下单时间排序，先查出该用户所有的订单数据，得到一个订单集合。然后在代码中，获取个元素的数据，即首单的数据，就能获取首单时间。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List<span class="operator">&lt;</span><span class="keyword">Order</span><span class="operator">&gt;</span> list <span class="operator">=</span> orderMapper.getOrderList();</span><br><span class="line"><span class="keyword">Order</span> <span class="keyword">order</span> <span class="operator">=</span> list.get(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>虽说这种做法在功能上没有问题，但它的效率非常不高，需要先查询出所有的数据，有点浪费资源。<br>那么，如何优化呢？<br><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id, create_date </span><br><span class="line"> <span class="keyword">from</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">where</span> user_id<span class="operator">=</span><span class="number">123</span> </span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> create_date <span class="keyword">asc</span> </span><br><span class="line">limit <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>使用limit 1，只返回该用户下单时间小的那一条数据即可。<br>此外，在删除或者修改数据时，为了防止误操作，导致删除或修改了不相干的数据，也可以在sql语句后加上limit。<br>例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> <span class="keyword">order</span> <span class="keyword">set</span> status<span class="operator">=</span><span class="number">0</span>,edit_time<span class="operator">=</span>now(<span class="number">3</span>) </span><br><span class="line"><span class="keyword">where</span> id<span class="operator">&gt;=</span><span class="number">100</span> <span class="keyword">and</span> id<span class="operator">&lt;</span><span class="number">200</span> limit <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+<p>这样即使误操作，比如把id搞错了，也不会对太多的数据造成影响。</p>
+<h2 id="6-in中值太多"><a href="#6-in中值太多" class="headerlink" title="6 in中值太多"></a>6 in中值太多</h2><p>对于批量查询接口，我们通常会使用in关键字过滤出数据。比如：想通过指定的一些id，批量查询出用户信息。<br>sql语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name <span class="keyword">from</span> category</span><br><span class="line"><span class="keyword">where</span> id <span class="keyword">in</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3.</span>.<span class="number">.100000000</span>);</span><br></pre></td></tr></table></figure>
+<p>如果我们不做任何限制，该查询语句一次性可能会查询出非常多的数据，很容易导致接口超时。<br>这时该怎么办呢？</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name <span class="keyword">from</span> category</span><br><span class="line"><span class="keyword">where</span> id <span class="keyword">in</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3.</span>.<span class="number">.100</span>)</span><br><span class="line">limit <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
+<p>可以在sql中对数据用limit做限制。<br>不过我们更多的是要在业务代码中加限制，伪代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> List&lt;Category&gt; <span class="title function_">getCategory</span><span class="params">(List&lt;Long&gt; ids)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(CollectionUtils.isEmpty(ids)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(ids.size() &gt; <span class="number">500</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;一次多允许查询500条记录&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> mapper.getCategoryList(ids);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还有一个方案就是：如果ids超过500条记录，可以分批用多线程去查询数据。每批只查500条记录，后把查询到的数据汇总到一起返回。<br>不过这只是一个临时方案，不适合于ids实在太多的场景。因为ids太多，即使能快速查出数据，但如果返回的数据量太大了，网络传输也是非常消耗性能的，接口性能始终好不到哪里去。</p>
+<h2 id="7-增量查询"><a href="#7-增量查询" class="headerlink" title="7 增量查询"></a>7 增量查询</h2><p>有时候，我们需要通过远程接口查询数据，然后同步到另外一个数据库。<br><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+<p>如果直接获取所有的数据，然后同步过去。这样虽说非常方便，但是带来了一个非常大的问题，就是如果数据很多的话，查询性能会非常差。<br>这时该怎么办呢？<br><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> </span><br><span class="line"><span class="keyword">where</span> id<span class="operator">&gt;</span>#&#123;lastId&#125; <span class="keyword">and</span> create_time <span class="operator">&gt;=</span> #&#123;lastCreateTime&#125; </span><br><span class="line">limit <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+<p>按id和时间升序，每次只同步一批数据，这一批数据只有100条记录。每次同步完成之后，保存这100条数据中大的id和时间，给同步下一批数据的时候用。<br>通过这种增量查询的方式，能够提升单次查询的效率。</p>
+<h2 id="8-高效的分页"><a href="#8-高效的分页" class="headerlink" title="8 高效的分页"></a>8 高效的分页</h2><p>有时候，列表页在查询数据时，为了避免一次性返回过多的数据影响接口性能，我们一般会对查询接口做分页处理。<br>在mysql中分页一般用的limit关键字：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> limit <span class="number">10</span>,<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>如果表中数据量少，用limit关键字做分页，没啥问题。但如果表中数据量很多，用它就会出现性能问题。<br>比如现在分页参数变成了：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> limit <span class="number">1000000</span>,<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>mysql会查到1000020条数据，然后丢弃前面的1000000条，只查后面的20条数据，这个是非常浪费资源的。<br>那么，这种海量数据该怎么分页呢？<br>优化sql：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="operator">&gt;</span> <span class="number">1000000</span> limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>先找到上次分页大的id，然后利用id上的索引查询。不过该方案，要求id是连续的，并且有序的。<br>还能使用between优化分页。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="keyword">between</span> <span class="number">1000000</span> <span class="keyword">and</span> <span class="number">1000020</span>;</span><br></pre></td></tr></table></figure>
+<p>需要注意的是between要在索引上分页，不然会出现每页大小不一致的问题。</p>
+<h2 id="9-用连接查询代替子查询"><a href="#9-用连接查询代替子查询" class="headerlink" title="9 用连接查询代替子查询"></a>9 用连接查询代替子查询</h2><p>mysql中如果需要从两张以上的表中查询出数据的话，一般有两种实现方式：子查询 和 连接查询。<br>子查询的例子如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="keyword">in</span> (<span class="keyword">select</span> id <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> status<span class="operator">=</span><span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>子查询语句可以通过in关键字实现，一个查询语句的条件落在另一个select语句的查询结果中。程序先运行在嵌套在内层的语句，再运行外层的语句。<br>子查询语句的优点是简单，结构化，如果涉及的表数量不多的话。<br>但缺点是mysql执行子查询时，需要创建临时表，查询完毕后，需要再删除这些临时表，有一些额外的性能消耗。<br>这时可以改成连接查询。具体例子如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.<span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span> o</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h2 id="10-join的表不宜过多"><a href="#10-join的表不宜过多" class="headerlink" title="10 join的表不宜过多"></a>10 join的表不宜过多</h2><p>根据阿里巴巴开发者手册的规定，join表的数量不应该超过3个。<br><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name,b.name.c.name,d.name</span><br><span class="line"><span class="keyword">from</span> a </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> b <span class="keyword">on</span> a.id <span class="operator">=</span> b.a_id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> c <span class="keyword">on</span> c.b_id <span class="operator">=</span> b.id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> d <span class="keyword">on</span> d.c_id <span class="operator">=</span> c.id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> e <span class="keyword">on</span> e.d_id <span class="operator">=</span> d.id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> f <span class="keyword">on</span> f.e_id <span class="operator">=</span> e.id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> g <span class="keyword">on</span> g.f_id <span class="operator">=</span> f.id</span><br></pre></td></tr></table></figure>
+<p>如果join太多，mysql在选择索引的时候会非常复杂，很容易选错索引。<br>并且如果没有命中中，nested loop join 就是分别从两个表读一行数据进行两两对比，复杂度是 n^2。<br>所以我们应该尽量控制join表的数量。<br><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name,b.name.c.name,a.d_name </span><br><span class="line"><span class="keyword">from</span> a </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> b <span class="keyword">on</span> a.id <span class="operator">=</span> b.a_id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> c <span class="keyword">on</span> c.b_id <span class="operator">=</span> b.id</span><br></pre></td></tr></table></figure>
+<p>如果实现业务场景中需要查询出另外几张表中的数据，可以在a、b、c表中冗余专门的字段，比如：在表a中冗余d_name字段，保存需要查询出的数据。<br>不过我之前也见过有些ERP系统，并发量不大，但业务比较复杂，需要join十几张表才能查询出数据。<br>所以join表的数量要根据系统的实际情况决定，不能一概而论，尽量越少越好。</p>
+<h2 id="11-join时要注意"><a href="#11-join时要注意" class="headerlink" title="11 join时要注意"></a>11 join时要注意</h2><p>我们在涉及到多张表联合查询的时候，一般会使用join关键字。<br>而join使用多的是left join和inner join。</p>
+<ul>
+<li>left join：求两个表的交集外加左表剩下的数据。</li>
+<li>inner join：求两个表交集的数据。</li>
+</ul>
+<p>使用inner join的示例如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.id,o.code,u.name </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">order</span> o </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>如果两张表使用inner join关联，mysql会自动选择两张表中的小表，去驱动大表，所以性能上不会有太大的问题。<br>使用left join的示例如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.id,o.code,u.name </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">order</span> o </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>如果两张表使用left join关联，mysql会默认用left join关键字左边的表，去驱动它右边的表。如果左边的表数据很多时，就会出现性能问题。<br>要特别注意的是在用left join关联查询时，左边要用小表，右边可以用大表。如果能用inner join的地方，尽量少用left join。</p>
+<h2 id="12-控制索引的数量"><a href="#12-控制索引的数量" class="headerlink" title="12 控制索引的数量"></a>12 控制索引的数量</h2><p>众所周知，索引能够显著的提升查询sql的性能，但索引数量并非越多越好。<br>因为表中新增数据时，需要同时为它创建索引，而索引是需要额外的存储空间的，而且还会有一定的性能消耗。<br>阿里巴巴的开发者手册中规定，单表的索引数量应该尽量控制在5个以内，并且单个索引中的字段数不超过5个。<br>mysql使用的B+树的结构来保存索引的，在insert、update和delete操作时，需要更新B+树索引。如果索引过多，会消耗很多额外的性能。<br>那么，问题来了，如果表中的索引太多，超过了5个该怎么办？<br>这个问题要辩证的看，如果你的系统并发量不高，表中的数据量也不多，其实超过5个也可以，只要不要超过太多就行。<br>但对于一些高并发的系统，请务必遵守单表索引数量不要超过5的限制。<br>那么，高并发系统如何优化索引数量？<br>能够建联合索引，就别建单个索引，可以删除无用的单个索引。<br>将部分查询功能迁移到其他类型的数据库中，比如：Elastic Seach、HBase等，在业务表中只需要建几个关键索引即可。</p>
+<h2 id="13-选择合理的字段类型"><a href="#13-选择合理的字段类型" class="headerlink" title="13 选择合理的字段类型"></a>13 选择合理的字段类型</h2><p>char表示固定字符串类型，该类型的字段存储空间的固定的，会浪费存储空间。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">add</span> <span class="keyword">column</span> code <span class="type">char</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+<p>varchar表示变长字符串类型，该类型的字段存储空间会根据实际数据的长度调整，不会浪费存储空间。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">add</span> <span class="keyword">column</span> code <span class="type">varchar</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+<p>如果是长度固定的字段，比如用户手机号，一般都是11位的，可以定义成char类型，长度是11字节。<br>但如果是企业名称字段，假如定义成char类型，就有问题了。<br>如果长度定义得太长，比如定义成了200字节，而实际企业长度只有50字节，则会浪费150字节的存储空间。<br>如果长度定义得太短，比如定义成了50字节，但实际企业名称有100字节，就会存储不下，而抛出异常。<br>所以建议将企业名称改成varchar类型，变长字段存储空间小，可以节省存储空间，而且对于查询来说，在一个相对较小的字段内搜索效率显然要高些。<br>我们在选择字段类型时，应该遵循这样的原则：</p>
+<ol>
+<li>能用数字类型，就不用字符串，因为字符的处理往往比数字要慢。</li>
+<li>尽可能使用小的类型，比如：用bit存布尔值，用tinyint存枚举值等。</li>
+<li>长度固定的字符串字段，用char类型。</li>
+<li>长度可变的字符串字段，用varchar类型。</li>
+<li>金额字段用decimal，避免精度丢失问题。</li>
+</ol>
+<p>还有很多原则，这里就不一一列举了。</p>
+<h2 id="14-提升group-by的效率"><a href="#14-提升group-by的效率" class="headerlink" title="14 提升group by的效率"></a>14 提升group by的效率</h2><p>我们有很多业务场景需要使用group by关键字，它主要的功能是去重和分组。<br>通常它会跟having一起配合使用，表示分组后再根据一定的条件过滤数据。<br><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,user_name <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> user_id</span><br><span class="line"><span class="keyword">having</span> user_id <span class="operator">&lt;=</span> <span class="number">200</span>;</span><br></pre></td></tr></table></figure>
+<p>这种写法性能不好，它先把所有的订单根据用户id分组之后，再去过滤用户id大于等于200的用户。<br>分组是一个相对耗时的操作，为什么我们不先缩小数据的范围之后，再分组呢？<br><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,user_name <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">&lt;=</span> <span class="number">200</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> user_id</span><br></pre></td></tr></table></figure>
+<p>使用where条件在分组前，就把多余的数据过滤掉了，这样分组时效率就会更高一些。<br>其实这是一种思路，不仅限于group by的优化。我们的sql语句在做一些耗时的操作之前，应尽可能缩小数据范围，这样能提升sql整体的性能。</p>
+<h2 id="15-索引优化"><a href="#15-索引优化" class="headerlink" title="15 索引优化"></a>15 索引优化</h2><p>sql优化当中，有一个非常重要的内容就是：索引优化。<br>很多时候sql语句，走了索引，和没有走索引，执行效率差别很大。所以索引优化被作为sql优化的。<br>索引优化的步是：检查sql语句有没有走索引。<br>那么，如何查看sql走了索引没？<br>可以使用explain命令，查看mysql的执行计划。<br>例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> `<span class="keyword">order</span>` <span class="keyword">where</span> code<span class="operator">=</span><span class="string">&#x27;002&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>结果：<img src="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422289-c0ee9703-d89b-48c0-b3aa-b33ae07b09dd.jpeg#averageHue=%23f9f4f3&clientId=u21a2e1b2-9e8b-4&from=paste&id=u418eb4fd&originHeight=77&originWidth=1080&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u6e2d063a-5b70-4cf3-97ac-6485f33d3dd&title=">通过这几列可以判断索引使用情况，执行计划包含列的含义如下图所示：<img src="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422640-f8a2c456-5724-4056-beb5-d3132319253a.jpeg#averageHue=%23bee4e2&clientId=u21a2e1b2-9e8b-4&from=paste&id=u4ffd814f&originHeight=1024&originWidth=920&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=u487188a8-917a-4910-836f-518febbed2b&title=">如果你想进一步了解explain的详细用法，可以看看我的另一篇文章《<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzUxODkzNTQ3Nw==&mid=2247485392&idx=1&sn=a0a2728179e20ad09487f09e0a785ec2&chksm=f980010acef7881c0591beb4e90220de5c283a63c74e02910830f4cb99922c388ee0226e7c88&token=393604486&lang=zh_CN&scene=21#wechat_redirect">explain | 索引优化的这把绝世好剑，你真的会用吗？</a>》<br>说实话，sql语句没有走索引，排除没有建索引之外，大的可能性是索引失效了。<br>下面说说索引失效的常见原因：<img src="https://cdn.nlark.com/yuque/0/2023/jpeg/29334239/1688700422292-6fa46323-52ba-4a00-9bf5-6373392fe97d.jpeg#averageHue=%23f7f7f6&clientId=u21a2e1b2-9e8b-4&from=paste&id=ud0c247dc&originHeight=770&originWidth=1080&originalType=url&ratio=2&rotation=0&showTitle=false&status=done&style=none&taskId=ube96bb44-df00-4efe-960a-31546e31471&title=">如果不是上面的这些原因，则需要再进一步排查一下其他原因。<br>此外，你有没有遇到过这样一种情况：明明是同一条sql，只有入参不同而已。有的时候走的索引a，有的时候却走的索引b？<br>没错，有时候mysql会选错索引。<br>必要时可以使用force index来强制查询sql走某个索引。</p>
+
+        
+      </div>
+
+         
+    </div>
+    
+     
+  </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left  disabled "
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2023/11/05/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%B7%A5%E5%85%B7-wire/"
+      title="依赖注入wire"
+     >
+
+    <p class="title-text">
+      
+        依赖注入wire
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+  
+  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+  <div id="comment-card" class="comment-card">
+    <div class="main-title-bar">
+      <div class="main-title-dot"></div>
+      <div class="main-title">留言 </div>
+    </div>
+    <div id="vcomments"></div>
+  </div>
+  <script>
+      new Valine({"enable":true,"appId":"LKrpqiXJrQY3ZkCCZ4nZ74BD-gzGzoHsz","appKey":"3JjUeFXXRTKbLQYsjTFTZ1fc","placeholder":"Just go go","pageSize":10,"highlight":true,"serverURLs":null,"el":"#vcomments"});
+  </script>
+ 
+    </div>
+    <div id="footer-wrapper">
+      <!-- <footer id="footer">
+  
+  <div id="footer-info" class="inner">
+    
+    &copy; 2023 GoIruri<br>
+    Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
+  </div>
+</footer> -->
+
+    </div>
+    <div class="back-to-top-wrapper">
+    <button id="back-to-top-btn" class="back-to-top-btn hide" onclick="topFunction()">
+        <i class="fa-solid fa-angle-up"></i>
+    </button>
+</div>
+
+<script>
+    function topFunction() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    let btn = document.getElementById('back-to-top-btn');
+    function scrollFunction() {
+        if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+            btn.classList.remove('hide')
+        } else {
+            btn.classList.add('hide')
+        }
+    }
+    window.onscroll = function() {
+        scrollFunction();
+    }
+</script>
+
+  </div>
+  <script src="/js/light-dark-switch.js"></script>
+</body>
+</html>
