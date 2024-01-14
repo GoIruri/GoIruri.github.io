@@ -609,7 +609,7 @@ Providerswire 的主要机制是 Provider：具有返回值的函数。这些函
   
     
       <h1 itemprop="name">
-        <a class="p-name article-title" href="/2023/11/05/SingleFlight/">SigleFlight</a>
+        <a class="p-name article-title" href="/2023/11/05/SingleFlight/">SingleFlight</a>
       </h1>
     
   
@@ -628,7 +628,7 @@ Providerswire 的主要机制是 Provider：具有返回值的函数。这些函
   
           </div>
           <div class="wordcount need-seperator meta-info">
-            2.6k 词 
+            1.4k 词 
           </div>
         </div>
         
@@ -638,8 +638,10 @@ Providerswire 的主要机制是 Provider：具有返回值的函数。这些函
       <div class="e-content article-entry" itemprop="articleBody">
         
           <div class="truncate-text">
-            SingleFlight为什么我们需要 SingleFlight（使用场景）？一般情况下我们在写一写对外的服务的时候都会有一层 cache 作为缓存，用来减少底层数据库的压力，但是在遇到例如 redis 抖动或者其他情况可能会导致大量的 cache miss 出现。如下图所示，可能存在来自桌面端和移动端的用户有 1000 的并发请求，他们都访问的获取文章列表的接口，获取前 20 条信息，如果这个时候我们服务直接去访问 redis 出现 cache miss 那么我们就会去请求 1000 次数据库，这时可能会给数据库带来较大的压力（这里的 1000 只是一个例子，实际上可能远大于这个值）导致我们的服务异常或者超时。这时候就可以使用 singleflight 库了，直译过来就是单飞，这个库的主要作用就是将一组相同的请求合并成一个请求，实际上只会去请求一次，然后对所有的请求返回相同的结果。如下图所示，使用 singleflight 之后，我们在一个请求的时间周期内实际上只会向底层的数据库发起一次请求大大减少对数据库的压力。
-SingleFlight 包怎么用（使用教程）？函数签名主要是...  
+            本文主要介绍Go语言中的singleflight包，包括什么是singleflight以及如何使用singleflight合并请求解决缓存击穿问题。
+singleflight 目前（Go1.20）还属于Go的准标准库，它提供了重复函数调用抑制机制，使用它可以避免同时进行相同的函数调用。第一个调用未完成时后续的重复调用会等待，当第一个调用完成时则会与它们分享结果，这样以来虽然只执行了一次函数调用但是所有调用都拿到了最终的调用结果。
+基础示例我们首先来看以下示例代码，在第1次调用getData函数没返回结果时，再次调用getData函数。
+1234567891011121314151617181920212223242526272829303132333435package mainimport (	&quot;fmt&quot;	&quot;golang.org/x/sync/singleflight&quot;	&quot;time&quot;)func getData(id int64) string &#123;	fmt.Println(&quot;query...&quot...  
           </div>
         
       </div>
