@@ -157,6 +157,11 @@
       <h3 class="widget-title">归档</h3>
       
       
+        <a class="archive-link" href="/archives/2024/01 ">
+          一月 2024 
+          <div class="archive-count">1 </div>
+        </a>
+      
         <a class="archive-link" href="/archives/2023/12 ">
           十二月 2023 
           <div class="archive-count">1 </div>
@@ -203,6 +208,12 @@
       <h3 class="widget-title">最新文章</h3>
       <ul>
         
+          <a class="recent-link" href="/2024/01/14/delayqueue%E7%9A%84Go%E7%AE%80%E6%98%93%E5%AE%9E%E7%8E%B0/" title="delayqueue的Go简易实现" >
+            <div class="recent-link-text">
+              delayqueue的Go简易实现
+            </div>
+          </a>
+        
           <a class="recent-link" href="/2023/12/23/SQL%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/" title="SQL优化方法" >
             <div class="recent-link-text">
               SQL优化方法
@@ -227,12 +238,6 @@
             </div>
           </a>
         
-          <a class="recent-link" href="/2023/11/05/SingleFlight/" title="SigleFlight" >
-            <div class="recent-link-text">
-              SigleFlight
-            </div>
-          </a>
-        
       </ul>
     </div>
   </div>
@@ -243,6 +248,109 @@
     </div>
     <div id="content-body">
       
+   
+
+<article id="post-编译器优化" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/03/18/%E7%BC%96%E8%AF%91%E5%99%A8%E4%BC%98%E5%8C%96/">编译</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-03-18T10:14:25.000Z" itemprop="datePublished">2023-03-18</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/Go/">Go</a>><a class="meta-cate-link" href="/categories/Go/%E7%BC%96%E8%AF%91/">编译</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            948 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BC%96%E8%AF%91/" rel="tag">编译</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            编译器的结构
+重要的系统软件
+识别符合语法和非法的程序
+生成正确且高效的代码
+
+
+分析部分（前端front end）
+词法分析，生成词素（lexeme）
+语法分析，生成语法树
+语义分析，收集类型信息，进行语义检查
+中间代码生成，生成intermediate representation（IR)
+
+
+综合部分（后端back end）
+代码优化，机器无关优化，生成优化后的IR
+代码生成，生成目标代码
+
+
+
+
+静态分析
+静态分析：不执行程序代码，推导程序的行为，分析程序的性质。
+控制流（control flow）：程序执行的流程
+数据量（data flow）：数据在控制流上的传递
+根据分析控制流和数据流，我们可以知道更多关于程序的性质（properties）
+根据这些性质优化代码
+
+过程内分析和过程间分析
+过程内分析（intra-procedural analysis）
+仅在函数内部进行分析
+
+
+过程间分析（inter-procedural analysis）
+考虑函数调用时参数传递和返回值的数据流和控制流
+
+
+为什么过程间分析是个问题？
+需要通过数据流分析得知 i 的具体类型，才知道...  
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/03/18/%E7%BC%96%E8%AF%91%E5%99%A8%E4%BC%98%E5%8C%96/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+ 
+
    
 
 <article id="post-面向对象设计原则" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
@@ -571,7 +679,7 @@ x 断言成了 type 类型，type 类型具体值就是 switc...
   
   <div id="footer-info" class="inner">
     
-    &copy; 2023 GoIruri<br>
+    &copy; 2024 GoIruri<br>
     Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
   </div>
 </footer> -->
