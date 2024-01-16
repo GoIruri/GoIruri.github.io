@@ -513,6 +513,83 @@
 
    
 
+<article id="post-类型转换" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/02/18/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/">类型转换</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-02-18T10:14:25.000Z" itemprop="datePublished">2023-02-18</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/Go/">Go</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            1.2k 词 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" rel="tag">类型转换</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            go类型转换go 存在 4 种类型转换分别为：断言、强制、显式、隐式。
+通常说的类型转换是指断言，强制在日常不会使用到、显示是基本的类型转换、隐式使用到但是不会注意到。断言、强制、显式三类在 go 语法描述中均有说明，隐式是在日常使用过程中总结出来。
+断言类型转换（针对接口）断言通过判断变量是否可以转换成某一个类型1var s = x.(T)
+
+如果 x 不是 nil，且 x 可以转换成 T 类型，就会断言成功，返回 T 类型的变量 s。如果 T 不是接口类型，则要求 x 的类型就是 T，如果 T 是一个接口，要求 x 实现了 T 接口。
+如果断言类型成立，则表达式返回值就是 T 类型的 x，如果断言失败就会触发 panic。
+上述表所示再断言失败就会 panic，go 提供了另外一种带返回是否成立的断言语法：
+1s, ok := x.(T)
+
+该方法和第一种差不多一样，但是 ok 会返回是否断言成功不会出现 panic，ok 就表示是否是成功了。
+类型switchgo语法还提供了一种类型switch的断言方法。
+x 断言成了 type 类型，type 类型具体值就是 switc...  
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/02/18/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+ 
+
+   
+
 <article id="post-内存管理" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
    
   <div class="article-inner">
@@ -591,83 +668,6 @@ g -&gt; m -&gt; p -&gt; mcache -&gt; mspan -&gt; memory block -&gt; return point
     <a class="right-panel  non-pic  "
       
       href="/2023/02/18/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
- 
-
-   
-
-<article id="post-类型转换" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2023/02/18/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/">类型转换</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2023-02-18T10:14:25.000Z" itemprop="datePublished">2023-02-18</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-  <a class="meta-cate-link" href="/categories/Go/">Go</a>
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-            1.2k 词 
-          </div>
-        </div>
-        
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Go/" rel="tag">Go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" rel="tag">类型转换</a></li></ul>
-
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            go类型转换go 存在 4 种类型转换分别为：断言、强制、显式、隐式。
-通常说的类型转换是指断言，强制在日常不会使用到、显示是基本的类型转换、隐式使用到但是不会注意到。断言、强制、显式三类在 go 语法描述中均有说明，隐式是在日常使用过程中总结出来。
-断言类型转换（针对接口）断言通过判断变量是否可以转换成某一个类型1var s = x.(T)
-
-如果 x 不是 nil，且 x 可以转换成 T 类型，就会断言成功，返回 T 类型的变量 s。如果 T 不是接口类型，则要求 x 的类型就是 T，如果 T 是一个接口，要求 x 实现了 T 接口。
-如果断言类型成立，则表达式返回值就是 T 类型的 x，如果断言失败就会触发 panic。
-上述表所示再断言失败就会 panic，go 提供了另外一种带返回是否成立的断言语法：
-1s, ok := x.(T)
-
-该方法和第一种差不多一样，但是 ok 会返回是否断言成功不会出现 panic，ok 就表示是否是成功了。
-类型switchgo语法还提供了一种类型switch的断言方法。
-x 断言成了 type 类型，type 类型具体值就是 switc...  
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2023/02/18/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" 
     >
        
       <i class="fa-solid fa-angle-right non-pic"></i>
