@@ -1,0 +1,311 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>SingleFlight | igl1t's blog</title><meta name="author" content="igl1t"><meta name="copyright" content="igl1t"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="SingleFlight为什么我们需要 SingleFlight（使用场景）？一般情况下我们在写一写对外的服务的时候都会有一层 cache 作为缓存，用来减少底层数据库的压力，但是在遇到例如 redis 抖动或者其他情况可能会导致大量的 cache miss 出现。 如下图所示，可能存在来自桌面端和移动端的用户有 1000 的并发请求，他们都访问的获取文章列表的接口，获取前 20 条信息，如果这个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SingleFlight">
+<meta property="og:url" content="http://example.com/2025/02/04/SingleFlight/index.html">
+<meta property="og:site_name" content="igl1t&#39;s blog">
+<meta property="og:description" content="SingleFlight为什么我们需要 SingleFlight（使用场景）？一般情况下我们在写一写对外的服务的时候都会有一层 cache 作为缓存，用来减少底层数据库的压力，但是在遇到例如 redis 抖动或者其他情况可能会导致大量的 cache miss 出现。 如下图所示，可能存在来自桌面端和移动端的用户有 1000 的并发请求，他们都访问的获取文章列表的接口，获取前 20 条信息，如果这个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2025-02-04T12:52:00.034Z">
+<meta property="article:modified_time" content="2025-02-04T07:49:39.000Z">
+<meta property="article:author" content="igl1t">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "SingleFlight",
+  "url": "http://example.com/2025/02/04/SingleFlight/",
+  "image": "http://example.com/img/butterfly-icon.png",
+  "datePublished": "2025-02-04T12:52:00.034Z",
+  "dateModified": "2025-02-04T07:49:39.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "igl1t",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/02/04/SingleFlight/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SingleFlight',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/back.png);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/back.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">igl1t's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">SingleFlight</span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">SingleFlight</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-04T12:52:00.034Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-04T07:49:39.000Z" title="更新于 2025-02-04 15:49:39">2025-02-04</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="SingleFlight"><a href="#SingleFlight" class="headerlink" title="SingleFlight"></a>SingleFlight</h2><h3 id="为什么我们需要-SingleFlight（使用场景）？"><a href="#为什么我们需要-SingleFlight（使用场景）？" class="headerlink" title="为什么我们需要 SingleFlight（使用场景）？"></a>为什么我们需要 SingleFlight（使用场景）？</h3><p><font style="color:rgb(44, 62, 80);">一般情况下我们在写一写对外的服务的时候都会有一层 cache 作为缓存，用来减少底层数据库的压力，但是在遇到例如 redis 抖动或者其他情况可能会导致大量的 cache miss 出现。</font></p>
+<p><font style="color:rgb(44, 62, 80);">如下图所示，可能存在来自桌面端和移动端的用户有 1000 的并发请求，他们都访问的获取文章列表的接口，获取前 20 条信息，如果这个时候我们服务直接去访问 redis 出现 cache miss 那么我们就会去请求 1000 次数据库，这时可能会给数据库带来较大的压力（这里的 1000 只是一个例子，实际上可能远大于这个值）导致我们的服务异常或者超时。<br></font><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1687506053233-edf09d30-7212-417f-8797-18b7f51043b2.png"><font style="color:rgb(44, 62, 80);"><br></font><font style="color:rgb(44, 62, 80);">这时候就可以使用 singleflight 库了，直译过来就是单飞，这个库的主要作用就是将一组相同的请求合并成一个请求，实际上只会去请求一次，然后对所有的请求返回相同的结果。<br></font><font style="color:rgb(44, 62, 80);">如下图所示，使用 singleflight 之后，我们在一个请求的时间周期内实际上只会向底层的数据库发起一次请求大大减少对数据库的压力。<br></font><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1687506064575-54c4037a-86e3-4058-9225-ebb70ea428aa.png"></p>
+<h3 id="SingleFlight-包怎么用（使用教程）？"><a href="#SingleFlight-包怎么用（使用教程）？" class="headerlink" title="SingleFlight 包怎么用（使用教程）？"></a>SingleFlight 包怎么用（使用教程）？</h3><h4 id="函数签名"><a href="#函数签名" class="headerlink" title="函数签名"></a>函数签名</h4><p><font style="color:rgb(44, 62, 80);">主要是一个 </font>Group<font style="color:rgb(44, 62, 80);">  结构体，三个方法，具体信息看下方注释</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go type Group // Do 执行函数, 对同一个 key 多次调用的时候，在第一次调用没有执行完的时候 // 只会执行一次 fn 其他的调用会阻塞住等待这次调用返回 // v, err 是传入的 fn 的返回值 // shared 表示是否真正执行了 fn 返回的结果，还是返回的共享的结果 func (g *Group) Do(key string, fn func() (interface&#123;&#125;, error)) (v interface&#123;&#125;, err error, shared bool)  // DoChan 和 Do 类似，只是 DoChan 返回一个 channel，也就是同步与异步的区别 func (g *Group) DoChan(key string, fn func() (interface&#123;&#125;, error)) &lt;-chan Result  // Forget 用于通知 Group 删除某个 key 这样后面继续这个 key 的调用的时候就不会在阻塞等待了 func (g *Group) Forget(key string) </code></th>
+</tr>
+</thead>
+</table>
+<h4 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h4><p><font style="color:rgb(44, 62, 80);">接下来我们看看实际上我们是怎么使用的，先使用一个普通的例子，这时一个获取文章详情的函数，我们在函数里面使用一个 count 模拟不同并发下的耗时的不同，并发越多请求耗时越多</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func getArticle(id int) (article string, err error) &#123;     // 假设这里会对数据库进行调用, 模拟不同并发下耗时不同     atomic.AddInt32(&amp;count, 1)     time.Sleep(time.Duration(count) * time.Millisecond)      return fmt.Sprintf(&quot;article: %d&quot;, id), nil &#125; </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">我们使用 singleflight 的时候就只需要</font><font style="color:rgb(44, 62, 80);"> </font>new(singleflight.Group)<font style="color:rgb(44, 62, 80);">  然后调用一下相对应的 Do 方法就可了，是不是很简单</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func singleflightGetArticle(sg *singleflight.Group, id int) (string, error) &#123;     v, err, _ := sg.Do(fmt.Sprintf(&quot;%d&quot;, id), func() (interface&#123;&#125;, error) &#123;         return getArticle(id)     &#125;)      return v.(string), err &#125; </code></th>
+</tr>
+</thead>
+</table>
+<h4 id="效果测试"><a href="#效果测试" class="headerlink" title="效果测试"></a>效果测试</h4><p><font style="color:rgb(44, 62, 80);">光说不练假把式，写一个简单的测试代码，下面我们启动 1000 个 Goroutine 去并发调用这两个方法</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go var count int32  func main() &#123;     time.AfterFunc(1*time.Second, func() &#123;         atomic.AddInt32(&amp;count, -count)     &#125;)      var (         wg  sync.WaitGroup         now = time.Now()         n   = 1000         sg  = &amp;singleflight.Group&#123;&#125;     )      for i := 0; i &lt; n; i++ &#123;         wg.Add(1)         go func() &#123;             // res, _ := singleflightGetArticle(sg, 1)             res, _ := getArticle(1)             if res != &quot;article: 1&quot; &#123;                 panic(&quot;err&quot;)             &#125;             wg.Done()         &#125;()     &#125;      wg.Wait()     fmt.Printf(&quot;同时发起 %d 次请求，耗时: %s&quot;, n, time.Since(now)) &#125; </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">可以看到这个是调用</font><font style="color:rgb(44, 62, 80);"> </font>getArticle<font style="color:rgb(44, 62, 80);">  方法的耗时，花费了 1s 多</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go # 直接调用的请求耗时 ❯ go run ./1.go 同时发起 1000 次请求，耗时: 1.0022831s </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">而使用 singleflight 的方法，花费了不到 3ms</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go # 使用 singleflight 的请求耗时 ❯ go run ./1.go 同时发起 1000 次请求，耗时: 2.5119ms </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">当然每个库都有自己的使用场景，软件领域里面没有银弹，如果我们用的不太好的话甚至可能会得到适得其反的效果，而多看源码不仅能够帮助我们进行学习，也可以尽量少踩坑</font></p>
+<h3 id="它是如何实现的（源码分析）？"><a href="#它是如何实现的（源码分析）？" class="headerlink" title="它是如何实现的（源码分析）？"></a>它是如何实现的（源码分析）？</h3><p><font style="color:rgb(44, 62, 80);background-color:rgb(232, 247, 255);">本文基于 <a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/sync@v0.0.0-20210220032951-036812b2e83c/singleflight">https:&#x2F;&#x2F;pkg.go.dev&#x2F;golang.org&#x2F;x&#x2F;sync@v0.0.0-20210220032951-036812b2e83c/singleflight</a> 进行分析，这个库的实现很简单，但是功能很强大，还有一些小技巧，非常值得学习</font></p>
+<h4 id="Group"><a href="#Group" class="headerlink" title="Group"></a>Group</h4><table>
+<thead>
+<tr>
+<th><code>go type Group struct &#123;     mu sync.Mutex       // protects m     m  map[string]*call // lazily initialized &#125; </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">Group 结构体由一个互斥锁和一个 map 组成，可以看到注释 map 是懒加载的，所以 Group 只要声明就可以使用，不用进行额外的初始化零值就可以直接使用。call 保存了当前调用对应的信息，map 的键就是我们调用</font><font style="color:rgb(44, 62, 80);"> </font>Do<font style="color:rgb(44, 62, 80);">  方法传入的 key</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go type call struct &#123;     wg sync.WaitGroup      // 函数的返回值，在 wg 返回前只会写入一次     val interface&#123;&#125;     err error      // 使用调用了 Forgot 方法     forgotten bool      // 统计调用次数以及返回的 channel     dups  int     chans []chan&lt;- Result &#125; </code></th>
+</tr>
+</thead>
+</table>
+<h4 id="Do"><a href="#Do" class="headerlink" title="Do"></a>Do</h4><table>
+<thead>
+<tr>
+<th><code>go func (g *Group) Do(key string, fn func() (interface&#123;&#125;, error)) (v interface&#123;&#125;, err error, shared bool) &#123;     g.mu.Lock()      // 前面提到的懒加载     if g.m == nil &#123;         g.m = make(map[string]*call)     &#125;      // 会先去看 key 是否已经存在     if c, ok := g.m[key]; ok &#123;         // 如果存在就会解锁         c.dups++         g.mu.Unlock()          // 然后等待 WaitGroup 执行完毕，只要一执行完，所有的 wait 都会被唤醒         c.wg.Wait()          // 这里区分 panic 错误和 runtime 的错误，避免出现死锁，后面可以看到为什么这么做         if e, ok := c.err.(*panicError); ok &#123;             panic(e)         &#125; else if c.err == errGoexit &#123;             runtime.Goexit()         &#125;         return c.val, c.err, true     &#125;      // 如果我们没有找到这个 key 就 new call     c := new(call)      // 然后调用 waitgroup 这里只有第一次调用会 add 1，其他的都会调用 wait 阻塞掉     // 所以这要这次调用返回，所有阻塞的调用都会被唤醒     c.wg.Add(1)     g.m[key] = c     g.mu.Unlock()      // 然后我们调用 doCall 去执行     g.doCall(c, key, fn)     return c.val, c.err, c.dups &gt; 0 &#125; </code></th>
+</tr>
+</thead>
+</table>
+<h4 id="doCall"><a href="#doCall" class="headerlink" title="doCall"></a>doCall</h4><p><font style="color:rgb(44, 62, 80);">这个方法的实现有点意思，使用了两个 defer 巧妙的将 runtime 的错误和我们传入 function 的 panic 区别开来避免了由于传入的 function panic 导致的死锁</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func (g *Group) doCall(c *call, key string, fn func() (interface&#123;&#125;, error)) &#123;     normalReturn := false     recovered := false      // 第一个 defer 检查 runtime 错误     defer func() &#123;      &#125;()      // 使用一个匿名函数来执行     func() &#123;         defer func() &#123;             if !normalReturn &#123;                 // 如果 panic 了我们就 recover 掉，然后 new 一个 panic 的错误                 // 后面在上层重新 panic                 if r := recover(); r != nil &#123;                     c.err = newPanicError(r)                 &#125;             &#125;         &#125;()          c.val, c.err = fn()          // 如果 fn 没有 panic 就会执行到这一步，如果 panic 了就不会执行到这一步         // 所以可以通过这个变量来判断是否 panic 了         normalReturn = true     &#125;()      // 如果 normalReturn 为 false 就表示，我们的 fn panic 了     // 如果执行到了这一步，也说明我们的 fn  recover 住了，不是直接 runtime exit     if !normalReturn &#123;         recovered = true     &#125; &#125; </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">再来看看第一个 defer 中的代码</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go defer func() &#123;     // 如果既没有正常执行完毕，又没有 recover 那就说明需要直接退出了     if !normalReturn &amp;&amp; !recovered &#123;         c.err = errGoexit     &#125;      c.wg.Done()     g.mu.Lock()     defer g.mu.Unlock()      // 如果已经 forgot 过了，就不要重复删除这个 key 了     if !c.forgotten &#123;         delete(g.m, key)     &#125;      if e, ok := c.err.(*panicError); ok &#123;         // 如果返回的是 panic 错误，为了避免 channel 死锁，我们需要确保这个 panic 无法被恢复         if len(c.chans) &gt; 0 &#123;             go panic(e)             select &#123;&#125; // Keep this goroutine around so that it will appear in the crash dump.         &#125; else &#123;             panic(e)         &#125;     &#125; else if c.err == errGoexit &#123;         // 已经准备退出了，也就不用做其他操作了     &#125; else &#123;         // 正常情况下向 channel 写入数据         for _, ch := range c.chans &#123;             ch &lt;- Result&#123;c.val, c.err, c.dups &gt; 0&#125;         &#125;     &#125; &#125;() </code></th>
+</tr>
+</thead>
+</table>
+<h4 id="DoChan"><a href="#DoChan" class="headerlink" title="DoChan"></a>DoChan</h4><p><font style="color:rgb(44, 62, 80);">Do chan 和 Do 类似，其实就是一个是同步等待，一个是异步返回，主要实现上就是，如果调用 DoChan 会给 call.chans 添加一个 channel 这样等第一次调用执行完毕之后就会循环向这些 channel 写入数据</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func (g *Group) DoChan(key string, fn func() (interface&#123;&#125;, error)) &lt;-chan Result &#123;     ch := make(chan Result, 1)     g.mu.Lock()     if g.m == nil &#123;         g.m = make(map[string]*call)     &#125;     if c, ok := g.m[key]; ok &#123;         c.dups++         c.chans = append(c.chans, ch)         g.mu.Unlock()         return ch     &#125;     c := &amp;call&#123;chans: []chan&lt;- Result&#123;ch&#125;&#125;     c.wg.Add(1)     g.m[key] = c     g.mu.Unlock()      go g.doCall(c, key, fn)      return ch &#125; </code></th>
+</tr>
+</thead>
+</table>
+<h4 id="Forget"><a href="#Forget" class="headerlink" title="Forget"></a>Forget</h4><p><font style="color:rgb(44, 62, 80);">forget 用于手动释放某个 key 下次调用就不会阻塞等待了</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func (g *Group) Forget(key string) &#123;     g.mu.Lock()     if c, ok := g.m[key]; ok &#123;         c.forgotten = true     &#125;     delete(g.m, key)     g.mu.Unlock() &#125; </code></th>
+</tr>
+</thead>
+</table>
+<h3 id="有哪些注意事项（避坑指南）？"><a href="#有哪些注意事项（避坑指南）？" class="headerlink" title="有哪些注意事项（避坑指南）？"></a>有哪些注意事项（避坑指南）？</h3><p><font style="color:rgb(44, 62, 80);">单飞虽好但也不要滥用哦，还是存在一些坑的</font></p>
+<h3 id="1-一个阻塞，全员等待"><a href="#1-一个阻塞，全员等待" class="headerlink" title="1. 一个阻塞，全员等待"></a>1. 一个阻塞，全员等待</h3><p><font style="color:rgb(44, 62, 80);">使用 singleflight 我们比较常见的是直接使用 Do 方法，但是这个极端情况下会导致整个程序 hang 住，如果我们的代码出点问题，有一个调用 hang 住了，那么会导致所有的请求都 hang 住</font></p>
+<p><font style="color:rgb(44, 62, 80);">还是之前的例子，我们加一个 select 模拟阻塞</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func singleflightGetArticle(sg *singleflight.Group, id int) (string, error) &#123;     v, err, _ := sg.Do(fmt.Sprintf(&quot;%d&quot;, id), func() (interface&#123;&#125;, error) &#123;         // 模拟出现问题，hang 住         select &#123;&#125;         return getArticle(id)     &#125;)      return v.(string), err &#125; </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">执行就会发现死锁了</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go fatal error: all goroutines are asleep - deadlock!  goroutine 1 [select (no cases)]: </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">这时候我们可以使用 DoChan 结合 select 做超时控制</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go func singleflightGetArticle(ctx context.Context, sg *singleflight.Group, id int) (string, error) &#123;     result := sg.DoChan(fmt.Sprintf(&quot;%d&quot;, id), func() (interface&#123;&#125;, error) &#123;         // 模拟出现问题，hang 住         select &#123;&#125;         return getArticle(id)     &#125;)      select &#123;         case r := &lt;-result:         return r.Val.(string), r.Err         case &lt;-ctx.Done():         return &quot;&quot;, ctx.Err()     &#125; &#125; </code></th>
+</tr>
+</thead>
+</table>
+<p><font style="color:rgb(44, 62, 80);">调用的时候传入一个含 超时的 context 即可，执行时就会返回超时错误</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go ❯ go run ./1.go panic: context deadline exceeded </code></th>
+</tr>
+</thead>
+</table>
+<h3 id="2-一个出错，全部出错"><a href="#2-一个出错，全部出错" class="headerlink" title="2. 一个出错，全部出错"></a>2. 一个出错，全部出错</h3><p><font style="color:rgb(44, 62, 80);">这个本身不是什么问题，因为 singleflight 就是这么设计的，但是实际使用的时候 如果我们一次调用要 1s，我们的数据库请求或者是 下游服务可以支撑 10rps 的请求的时候这会导致我们的错误阈提高，因为实际上我们可以一秒内尝试 10 次，但是用了 singleflight 之后只能尝试一次，只要出错这段时间内的所有请求都会受影响</font></p>
+<p><font style="color:rgb(44, 62, 80);">这种情况我们可以启动一个 Goroutine 定时 forget 一下，相当于将 rps 从 1rps 提高到了 10rps</font></p>
+<table>
+<thead>
+<tr>
+<th><code>go go func() &#123;     time.Sleep(100 * time.Millisecond)     // logging     g.Forget(key) &#125;() </code></th>
+</tr>
+</thead>
+</table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><font style="color:rgb(44, 62, 80);">这篇文章从使用场景，到使用方法，再到源码分析和可能存在的坑给大家介绍了 singleflight，希望你能有所收获，没事看看官方的代码还是很有收获的，这次又学到了一个骚操作，用双重 defer 来避免死锁，你学废了么？</font></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">igl1t</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/02/04/SingleFlight/">http://example.com/2025/02/04/SingleFlight/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">igl1t's blog</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/02/04/vim%E6%89%93%E9%80%A0%E6%88%90idea/" title="vim打造成ide"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">vim打造成ide</div></div><div class="info-2"><div class="info-item-1">首先，介绍下环境： neovim，mac 插件管理vim-plugNeovimUnix, Linux12sh -c &#x27;curl -fLo &quot;$&#123;XDG_DATA_HOME:-$HOME/.local/share&#125;&quot;/nvim/site/autoload/plug.vim --create-dirs \       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim&#x27;  Linux (Flatpak)12curl -fLo ~/.var/app/io.neovim.nvim/data/nvim/site/autoload/plug.vim --create-dirs \    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim  Windows (PowerShell)12iwr -useb...</div></div></div></a><a class="pagination-related" href="/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" title="yaml文件详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">yaml文件详解</div></div><div class="info-2"><div class="info-item-1">一、yaml文件简介 Kubernetes只支持YAML和JSON格式创建资源对象，JSON格式用于接口之间消息的传递，适用于开发；YAML格式用于配置和管理，适用于云平台管理，YAML是一种简洁的非标记性语言。  1）yaml的语法规则： 大小写敏感 使用缩进表示层级关系 缩进时不允许使用Tal键，只允许使用空格 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可 ”#” 表示注释，从这个字符一直到行尾，都会被解析器忽略 注：- - - 为可选的分隔符 ，当需要在一个文件中定义多个结构的时候需要使用  2）在Kubernetes中，只需要知道两种结构类型即可： Lists Maps  2.1）YAML Maps Map顾名思义指的是字典，即一个Key:Value 的键值对信息。例如： 12apiVersion: v1kind: Pod   上述内容表示有两个键apiVersion和kind，分别对应的值为v1和Pod。  Maps的value既能够对应字符串也能够对应一个Maps。例如： 123456apiVersion: v1kind: Podmetadata: ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">igl1t</div><div class="author-info-description">某不知名黑客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SingleFlight"><span class="toc-number">1.</span> <span class="toc-text">SingleFlight</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81-SingleFlight%EF%BC%88%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%89%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">为什么我们需要 SingleFlight（使用场景）？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SingleFlight-%E5%8C%85%E6%80%8E%E4%B9%88%E7%94%A8%EF%BC%88%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B%EF%BC%89%EF%BC%9F"><span class="toc-number">1.2.</span> <span class="toc-text">SingleFlight 包怎么用（使用教程）？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E7%AD%BE%E5%90%8D"><span class="toc-number">1.2.1.</span> <span class="toc-text">函数签名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.2.2.</span> <span class="toc-text">使用示例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%88%E6%9E%9C%E6%B5%8B%E8%AF%95"><span class="toc-number">1.2.3.</span> <span class="toc-text">效果测试</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%83%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%9A%84%EF%BC%88%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%89%EF%BC%9F"><span class="toc-number">1.3.</span> <span class="toc-text">它是如何实现的（源码分析）？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Group"><span class="toc-number">1.3.1.</span> <span class="toc-text">Group</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Do"><span class="toc-number">1.3.2.</span> <span class="toc-text">Do</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#doCall"><span class="toc-number">1.3.3.</span> <span class="toc-text">doCall</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DoChan"><span class="toc-number">1.3.4.</span> <span class="toc-text">DoChan</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Forget"><span class="toc-number">1.3.5.</span> <span class="toc-text">Forget</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%93%AA%E4%BA%9B%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%88%E9%81%BF%E5%9D%91%E6%8C%87%E5%8D%97%EF%BC%89%EF%BC%9F"><span class="toc-number">1.4.</span> <span class="toc-text">有哪些注意事项（避坑指南）？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%B8%80%E4%B8%AA%E9%98%BB%E5%A1%9E%EF%BC%8C%E5%85%A8%E5%91%98%E7%AD%89%E5%BE%85"><span class="toc-number">1.5.</span> <span class="toc-text">1. 一个阻塞，全员等待</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%80%E4%B8%AA%E5%87%BA%E9%94%99%EF%BC%8C%E5%85%A8%E9%83%A8%E5%87%BA%E9%94%99"><span class="toc-number">1.6.</span> <span class="toc-text">2. 一个出错，全部出错</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/channel/" title="channel使用">channel使用</a><time datetime="2025-02-04T12:52:00.038Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" title="yaml文件详解">yaml文件详解</a><time datetime="2025-02-04T12:52:00.035Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/SingleFlight/" title="SingleFlight">SingleFlight</a><time datetime="2025-02-04T12:52:00.034Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/vim%E6%89%93%E9%80%A0%E6%88%90idea/" title="vim打造成ide">vim打造成ide</a><time datetime="2025-02-04T12:52:00.033Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="io 多路复用">io 多路复用</a><time datetime="2025-02-04T12:52:00.031Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By igl1t</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

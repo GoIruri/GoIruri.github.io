@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>channel使用 | igl1t's blog</title><meta name="author" content="igl1t"><meta name="copyright" content="igl1t"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="介绍 Go语⾔中，不要通过共享内存来通信，⽽要通过通信来实现内存共享。Go的 CSP(Communicating Sequential Process)并发模型，中⽂可以叫做通信顺序进程，是通过 goroutine 和 channel 来实现的。所以 channel 收发遵循先进先出 FIFO，分为有缓存和⽆缓存，channel 中⼤致有 buffer(当缓冲区⼤⼩部位0 时， 是个 ring b">
+<meta property="og:type" content="article">
+<meta property="og:title" content="channel使用">
+<meta property="og:url" content="http://example.com/2025/02/04/channel/index.html">
+<meta property="og:site_name" content="igl1t&#39;s blog">
+<meta property="og:description" content="介绍 Go语⾔中，不要通过共享内存来通信，⽽要通过通信来实现内存共享。Go的 CSP(Communicating Sequential Process)并发模型，中⽂可以叫做通信顺序进程，是通过 goroutine 和 channel 来实现的。所以 channel 收发遵循先进先出 FIFO，分为有缓存和⽆缓存，channel 中⼤致有 buffer(当缓冲区⼤⼩部位0 时， 是个 ring b">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2025-02-04T12:52:00.038Z">
+<meta property="article:modified_time" content="2025-02-04T07:48:35.000Z">
+<meta property="article:author" content="igl1t">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "channel使用",
+  "url": "http://example.com/2025/02/04/channel/",
+  "image": "http://example.com/img/butterfly-icon.png",
+  "datePublished": "2025-02-04T12:52:00.038Z",
+  "dateModified": "2025-02-04T07:48:35.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "igl1t",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/02/04/channel/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'channel使用',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/back.png);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/back.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">igl1t's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">channel使用</span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">channel使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-04T12:52:00.038Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-04T07:48:35.000Z" title="更新于 2025-02-04 15:48:35">2025-02-04</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><ul>
+<li>Go语⾔中，不要通过共享内存来通信，⽽要通过通信来实现内存共享。Go的 CSP(Communicating Sequential Process)并发模型，中⽂可以叫做通信顺序进程，是通过 goroutine 和 channel 来实现的。所以 channel 收发遵循先进先出 FIFO，分为有缓存和⽆缓存，channel 中⼤致有 buffer(当缓冲区⼤⼩部位0 时， 是个 ring buffer)、sendx 和 recvx 收发的位置(ring buffer 记录实现)、sendq、recvq 当前 channel 因为缓冲区不⾜⽽阻塞的队列、使⽤双向链表存储、还有⼀个 mutex 锁控制并发、其他原属等。</li>
+<li>向channel写入数据和从channel里面读数据都是原子性的，所以channel是并发安全的。</li>
+</ul>
+<h3 id="channel的特性"><a href="#channel的特性" class="headerlink" title="channel的特性"></a>channel的特性</h3><ol>
+<li>给⼀个 nil channel 发送数据，造成永远阻塞 </li>
+<li>从⼀个 nil channel 接收数据，造成永远阻塞 </li>
+<li>给⼀个已经关闭的 channel 发送数据，引起 panic </li>
+<li>从⼀个已经关闭的 channel 接收数据，如果缓冲区中为空，则返回⼀个零值 </li>
+<li>⽆缓冲的 channel 是同步的，⽽有缓冲的 channel 是⾮同步的 </li>
+<li>关闭⼀个 nil channel 将会发⽣ panic</li>
+</ol>
+<h3 id="channel的ring-buffer实现"><a href="#channel的ring-buffer实现" class="headerlink" title="channel的ring buffer实现"></a>channel的ring buffer实现</h3><p>channel 中使⽤了 ring buffer(环形缓冲区)来缓存写⼊的数据。ring buffer 有很多好处，⽽且⾮常适合⽤来实现 FIFO 式的固定⻓度队列。在 channel 中，ring buffer 的实现如下：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1676210671910-4380e9f1-7d6a-473c-893a-abe2bca86a46.png"></p>
+<p>hchan 中有两个与 buffer 相关的变量:recvx 和 sendx。其中 sendx 表示buffer 中可写的 index，recvx 表示 buffer 中可读的 index。从 recvx 到 sendx 之间的元素，表示已正常存放⼊ buffer 中的数据。</p>
+<p>我们可以直接使⽤ buf[recvx]来读取到队列的第⼀个元素，使⽤ buf[sendx]&#x3D; x 来将元素放到队尾。</p>
+<h3 id="无缓冲channel和有缓冲channel的demo"><a href="#无缓冲channel和有缓冲channel的demo" class="headerlink" title="无缓冲channel和有缓冲channel的demo"></a>无缓冲channel和有缓冲channel的demo</h3><p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1676210830796-11898cd8-a5a3-4ec3-abdc-a48bd6da9ee5.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/29334239/1676210889353-b9d003ed-ee3f-4a2d-8e3f-9f576dbf4cb9.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">igl1t</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/02/04/channel/">http://example.com/2025/02/04/channel/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">igl1t's blog</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" title="yaml文件详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">yaml文件详解</div></div><div class="info-2"><div class="info-item-1">一、yaml文件简介 Kubernetes只支持YAML和JSON格式创建资源对象，JSON格式用于接口之间消息的传递，适用于开发；YAML格式用于配置和管理，适用于云平台管理，YAML是一种简洁的非标记性语言。  1）yaml的语法规则： 大小写敏感 使用缩进表示层级关系 缩进时不允许使用Tal键，只允许使用空格 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可 ”#” 表示注释，从这个字符一直到行尾，都会被解析器忽略 注：- - - 为可选的分隔符 ，当需要在一个文件中定义多个结构的时候需要使用  2）在Kubernetes中，只需要知道两种结构类型即可： Lists Maps  2.1）YAML Maps Map顾名思义指的是字典，即一个Key:Value 的键值对信息。例如： 12apiVersion: v1kind: Pod   上述内容表示有两个键apiVersion和kind，分别对应的值为v1和Pod。  Maps的value既能够对应字符串也能够对应一个Maps。例如： 123456apiVersion: v1kind: Podmetadata: ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">igl1t</div><div class="author-info-description">某不知名黑客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#channel%E7%9A%84%E7%89%B9%E6%80%A7"><span class="toc-number">2.</span> <span class="toc-text">channel的特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#channel%E7%9A%84ring-buffer%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">channel的ring buffer实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E7%BC%93%E5%86%B2channel%E5%92%8C%E6%9C%89%E7%BC%93%E5%86%B2channel%E7%9A%84demo"><span class="toc-number">4.</span> <span class="toc-text">无缓冲channel和有缓冲channel的demo</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/channel/" title="channel使用">channel使用</a><time datetime="2025-02-04T12:52:00.038Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" title="yaml文件详解">yaml文件详解</a><time datetime="2025-02-04T12:52:00.035Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/SingleFlight/" title="SingleFlight">SingleFlight</a><time datetime="2025-02-04T12:52:00.034Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/vim%E6%89%93%E9%80%A0%E6%88%90idea/" title="vim打造成ide">vim打造成ide</a><time datetime="2025-02-04T12:52:00.033Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="io 多路复用">io 多路复用</a><time datetime="2025-02-04T12:52:00.031Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By igl1t</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

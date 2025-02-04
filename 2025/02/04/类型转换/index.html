@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>go 类型转换 | igl1t's blog</title><meta name="author" content="igl1t"><meta name="copyright" content="igl1t"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="go类型转换go 存在 4 种类型转换分别为：断言、强制、显式、隐式。 通常说的类型转换是指断言，强制在日常不会使用到、显示是基本的类型转换、隐式使用到但是不会注意到。断言、强制、显式三类在 go 语法描述中均有说明，隐式是在日常使用过程中总结出来。 断言类型转换（针对接口）断言通过判断变量是否可以转换成某一个类型1var s &#x3D; x.(T)    如果 x 不是 nil，且 x 可以转换成 T">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go 类型转换">
+<meta property="og:url" content="http://example.com/2025/02/04/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/index.html">
+<meta property="og:site_name" content="igl1t&#39;s blog">
+<meta property="og:description" content="go类型转换go 存在 4 种类型转换分别为：断言、强制、显式、隐式。 通常说的类型转换是指断言，强制在日常不会使用到、显示是基本的类型转换、隐式使用到但是不会注意到。断言、强制、显式三类在 go 语法描述中均有说明，隐式是在日常使用过程中总结出来。 断言类型转换（针对接口）断言通过判断变量是否可以转换成某一个类型1var s &#x3D; x.(T)    如果 x 不是 nil，且 x 可以转换成 T">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2025-02-04T12:52:00.031Z">
+<meta property="article:modified_time" content="2025-02-04T07:46:41.000Z">
+<meta property="article:author" content="igl1t">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "go 类型转换",
+  "url": "http://example.com/2025/02/04/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/",
+  "image": "http://example.com/img/butterfly-icon.png",
+  "datePublished": "2025-02-04T12:52:00.031Z",
+  "dateModified": "2025-02-04T07:46:41.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "igl1t",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/02/04/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'go 类型转换',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/back.png);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/back.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">igl1t's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">go 类型转换</span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">go 类型转换</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-04T12:52:00.031Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-04T07:46:41.000Z" title="更新于 2025-02-04 15:46:41">2025-02-04</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h3 id="go类型转换"><a href="#go类型转换" class="headerlink" title="go类型转换"></a>go类型转换</h3><p>go 存在 4 种类型转换分别为：断言、强制、显式、隐式。</p>
+<p>通常说的类型转换是指断言，强制在日常不会使用到、显示是基本的类型转换、隐式使用到但是不会注意到。断言、强制、显式三类在 go 语法描述中均有说明，隐式是在日常使用过程中总结出来。</p>
+<h3 id="断言类型转换（针对接口）"><a href="#断言类型转换（针对接口）" class="headerlink" title="断言类型转换（针对接口）"></a>断言类型转换（针对接口）</h3><h5 id="断言通过判断变量是否可以转换成某一个类型"><a href="#断言通过判断变量是否可以转换成某一个类型" class="headerlink" title="断言通过判断变量是否可以转换成某一个类型"></a><strong>断言通过判断变量是否可以转换成某一个类型</strong></h5><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = x.(T)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>如果 x 不是 nil，且 x 可以转换成 T 类型，就会断言成功，返回 T 类型的变量 s。如果 T 不是接口类型，则要求 x 的类型就是 T，如果 T 是一个接口，要求 x 实现了 T 接口。</p>
+<p>如果断言类型成立，则表达式返回值就是 T 类型的 x，如果断言失败就会触发 panic。</p>
+<p>上述表所示再断言失败就会 panic，go 提供了另外一种带返回是否成立的断言语法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s, ok := x.(T)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>该方法和第一种差不多一样，但是 ok 会返回是否断言成功不会出现 panic，ok 就表示是否是成功了。</p>
+<h5 id="类型switch"><a href="#类型switch" class="headerlink" title="类型switch"></a>类型switch</h5><p>go语法还提供了一种类型switch的断言方法。</p>
+<p>x 断言成了 type 类型，type 类型具体值就是 switch case 的值，如果 x 成功断言成了某个 case 类型，就可以执行那个 case，此时 <code>i := x.(type)</code> 返回的 i 就是那个类型的变量了，可以直接当作 case 类型使用。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">switch</span> i := x.(<span class="keyword">type</span>) &#123;</span><br><span class="line"><span class="keyword">case</span> <span class="literal">nil</span>:</span><br><span class="line">    printString(<span class="string">&quot;x is nil&quot;</span>)                <span class="comment">// type of i is type of x (interface&#123;&#125;)</span></span><br><span class="line"><span class="keyword">case</span> <span class="type">int</span>:</span><br><span class="line">    printInt(i)                            <span class="comment">// type of i is int</span></span><br><span class="line"><span class="keyword">case</span> <span class="type">float64</span>:</span><br><span class="line">    printFloat64(i)                        <span class="comment">// type of i is float64</span></span><br><span class="line"><span class="keyword">case</span> <span class="function"><span class="keyword">func</span><span class="params">(<span class="type">int</span>)</span></span> <span class="type">float64</span>:</span><br><span class="line">    printFunction(i)                       <span class="comment">// type of i is func(int) float64</span></span><br><span class="line"><span class="keyword">case</span> <span class="type">bool</span>, <span class="type">string</span>:</span><br><span class="line">    printString(<span class="string">&quot;type is bool or string&quot;</span>)  <span class="comment">// type of i is type of x (interface&#123;&#125;)</span></span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    printString(<span class="string">&quot;don&#x27;t know the type&quot;</span>)     <span class="comment">// type of i is type of x (interface&#123;&#125;)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="强制类型转换"><a href="#强制类型转换" class="headerlink" title="强制类型转换"></a>强制类型转换</h3><h5 id="强制类型转换通过修改变量类型"><a href="#强制类型转换通过修改变量类型" class="headerlink" title="强制类型转换通过修改变量类型"></a><strong>强制类型转换通过修改变量类型</strong></h5><p>该方法不常见，主要用于 unsafe 包和接口类型检测，需要懂得 go 变量的知识。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f <span class="type">float64</span></span><br><span class="line">bits = *(*<span class="type">uint64</span>)(unsafe.Pointer(&amp;f))</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ptr unsafe.Pointer</span><br><span class="line">bits = *(*<span class="type">uint64</span>)(ptr(&amp;f))</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p ptr = <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>float64 就强制转换成 uint64 类型，float 的地址就是一个值但是类型是 float64，然后创建了一个 uint64 类型变量，地址值也是 float64 的地址值，两个变量值相同类型不同，强制转换了类型。</p>
+<p>unsafe 强制转换是指针的底层操作了，用 c 的朋友就很熟悉这样的指针类型转换，利用内存对齐才能保证转换可靠，例如 int 和 uint 存在符号位差别，利用 unsafe 转换后值可能不同，但是在内存存储二进制一模一样。</p>
+<h3 id="显式类型转换"><a href="#显式类型转换" class="headerlink" title="显式类型转换"></a>显式类型转换</h3><p>一个显式转换的表达式 T (x) ，其中 T 是一种类型并且 x 是可转换为类型的表达式 T，例如：<code>uint(666)</code>。</p>
+<ul>
+<li>x 可以分配成 T 类型。</li>
+<li>忽略 struct 标签 x 的类型和 T 具有相同的基础类型。</li>
+<li>忽略 struct 标记 x 的类型和 T 是未定义类型的指针类型，并且它们的指针基类型具有相同的基础类型。</li>
+<li>x 的类型和 T 都是整数或浮点类型。</li>
+<li>x 的类型和 T 都是复数类型。</li>
+<li>x 的类型是整数或 [] byte 或 [] rune，并且 T 是字符串类型。</li>
+<li>x 的类型是字符串，T 类型是 [] byte 或 [] rune。</li>
+</ul>
+<h3 id="隐式类型转换"><a href="#隐式类型转换" class="headerlink" title="隐式类型转换"></a>隐式类型转换</h3><p><strong>隐式类型转换日常使用并不会感觉到，但是运行中确实出现了类型转换，以下列出了两种。</strong></p>
+<h5 id="组合间的重新类型断言"><a href="#组合间的重新类型断言" class="headerlink" title="组合间的重新类型断言"></a>组合间的重新类型断言</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Reader <span class="keyword">interface</span> &#123;</span><br><span class="line">    Read(p []<span class="type">byte</span>) (n <span class="type">int</span>, err <span class="type">error</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> ReadCloser <span class="keyword">interface</span> &#123;</span><br><span class="line">    Reader</span><br><span class="line">    Close() <span class="type">error</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> rc ReaderClose</span><br><span class="line">r := rc</span><br></pre></td></tr></table></figure>
+
+
+
+<p>ReaderClose 接口组合了 Reader 接口，但是 r&#x3D;rc 的赋值时还是类型转换了，go 使用系统内置的函数执行了类型转换。以前遇到过类似接口组合类型的变量赋值，然后使用 pprof 和 bench 测试发现了这一细节，在接口类型转移时浪费了一些性能。</p>
+<h5 id="相同类型间赋值"><a href="#相同类型间赋值" class="headerlink" title="相同类型间赋值"></a>相同类型间赋值</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Handler <span class="function"><span class="keyword">func</span><span class="params">()</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewHandler</span><span class="params">()</span></span> Handler &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>虽然 type 定义了 Handler 类型，但是 Handler 和 func () 是两种实际类型，类型不会相等，<strong>使用反射和断言均会出现两种类型不同</strong>。</p>
+<p>两种类型不同验证代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;reflect&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Handler <span class="function"><span class="keyword">func</span><span class="params">()</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">a</span><span class="params">()</span></span> Handler &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> i <span class="keyword">interface</span>&#123;&#125; = main</span><br><span class="line">    _, ok := i.(<span class="function"><span class="keyword">func</span><span class="params">()</span></span>)</span><br><span class="line">    fmt.Println(ok)</span><br><span class="line">    _, ok = i.(Handler)</span><br><span class="line">    fmt.Println(ok)</span><br><span class="line">    fmt.Println(reflect.TypeOf(main) == reflect.TypeOf((*Handler)(<span class="literal">nil</span>)).Elem())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// true</span></span><br><span class="line"><span class="comment">// false</span></span><br><span class="line"><span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">igl1t</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/02/04/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/">http://example.com/2025/02/04/%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">igl1t's blog</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/02/04/%E5%9B%BE%E8%A7%A3Go%E8%AF%AD%E8%A8%80%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" title="图解go语言内存分配"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">图解go语言内存分配</div></div><div class="info-2"><div class="info-item-1">Go语言内置运行时（就是runtime），抛弃了传统的内存分配方式，改为自主管理。这样可以自主地实现更好的内存使用模式，比如内存池、预分配等等。这样，不会每次内存分配都需要进行系统调用。 Golang运行时的内存分配算法主要源自 Google 为 C 语言开发的TCMalloc算法，全称Thread-Caching...</div></div></div></a><a class="pagination-related" href="/2025/02/04/vim%E6%89%93%E9%80%A0%E6%88%90idea/" title="vim打造成ide"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">vim打造成ide</div></div><div class="info-2"><div class="info-item-1">首先，介绍下环境： neovim，mac 插件管理vim-plugNeovimUnix, Linux12sh -c &#x27;curl -fLo &quot;$&#123;XDG_DATA_HOME:-$HOME/.local/share&#125;&quot;/nvim/site/autoload/plug.vim --create-dirs \       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim&#x27;  Linux (Flatpak)12curl -fLo ~/.var/app/io.neovim.nvim/data/nvim/site/autoload/plug.vim --create-dirs \    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim  Windows (PowerShell)12iwr -useb...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">igl1t</div><div class="author-info-description">某不知名黑客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#go%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-number">1.</span> <span class="toc-text">go类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%AD%E8%A8%80%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%EF%BC%88%E9%92%88%E5%AF%B9%E6%8E%A5%E5%8F%A3%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">断言类型转换（针对接口）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%AD%E8%A8%80%E9%80%9A%E8%BF%87%E5%88%A4%E6%96%AD%E5%8F%98%E9%87%8F%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E8%BD%AC%E6%8D%A2%E6%88%90%E6%9F%90%E4%B8%80%E4%B8%AA%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.0.1.</span> <span class="toc-text">断言通过判断变量是否可以转换成某一个类型</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%B1%BB%E5%9E%8Bswitch"><span class="toc-number">2.0.2.</span> <span class="toc-text">类型switch</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-number">3.</span> <span class="toc-text">强制类型转换</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E9%80%9A%E8%BF%87%E4%BF%AE%E6%94%B9%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.0.1.</span> <span class="toc-text">强制类型转换通过修改变量类型</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-number">4.</span> <span class="toc-text">显式类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9A%90%E5%BC%8F%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="toc-number">5.</span> <span class="toc-text">隐式类型转换</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E9%97%B4%E7%9A%84%E9%87%8D%E6%96%B0%E7%B1%BB%E5%9E%8B%E6%96%AD%E8%A8%80"><span class="toc-number">5.0.1.</span> <span class="toc-text">组合间的重新类型断言</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%B8%E5%90%8C%E7%B1%BB%E5%9E%8B%E9%97%B4%E8%B5%8B%E5%80%BC"><span class="toc-number">5.0.2.</span> <span class="toc-text">相同类型间赋值</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/channel/" title="channel使用">channel使用</a><time datetime="2025-02-04T12:52:00.038Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" title="yaml文件详解">yaml文件详解</a><time datetime="2025-02-04T12:52:00.035Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/SingleFlight/" title="SingleFlight">SingleFlight</a><time datetime="2025-02-04T12:52:00.034Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/vim%E6%89%93%E9%80%A0%E6%88%90idea/" title="vim打造成ide">vim打造成ide</a><time datetime="2025-02-04T12:52:00.033Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="io 多路复用">io 多路复用</a><time datetime="2025-02-04T12:52:00.031Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By igl1t</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

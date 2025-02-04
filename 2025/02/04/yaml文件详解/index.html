@@ -1,0 +1,288 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>yaml文件详解 | igl1t's blog</title><meta name="author" content="igl1t"><meta name="copyright" content="igl1t"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、yaml文件简介 Kubernetes只支持YAML和JSON格式创建资源对象，JSON格式用于接口之间消息的传递，适用于开发；YAML格式用于配置和管理，适用于云平台管理，YAML是一种简洁的非标记性语言。  1）yaml的语法规则： 大小写敏感 使用缩进表示层级关系 缩进时不允许使用Tal键，只允许使用空格 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可 ”#” 表示注释，从这个字符">
+<meta property="og:type" content="article">
+<meta property="og:title" content="yaml文件详解">
+<meta property="og:url" content="http://example.com/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="igl1t&#39;s blog">
+<meta property="og:description" content="一、yaml文件简介 Kubernetes只支持YAML和JSON格式创建资源对象，JSON格式用于接口之间消息的传递，适用于开发；YAML格式用于配置和管理，适用于云平台管理，YAML是一种简洁的非标记性语言。  1）yaml的语法规则： 大小写敏感 使用缩进表示层级关系 缩进时不允许使用Tal键，只允许使用空格 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可 ”#” 表示注释，从这个字符">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2025-02-04T12:52:00.035Z">
+<meta property="article:modified_time" content="2025-02-04T07:51:24.000Z">
+<meta property="article:author" content="igl1t">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "yaml文件详解",
+  "url": "http://example.com/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/",
+  "image": "http://example.com/img/butterfly-icon.png",
+  "datePublished": "2025-02-04T12:52:00.035Z",
+  "dateModified": "2025-02-04T07:51:24.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "igl1t",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'yaml文件详解',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/back.png);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/back.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">igl1t's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">yaml文件详解</span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">yaml文件详解</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-04T12:52:00.035Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-02-04T07:51:24.000Z" title="更新于 2025-02-04 15:51:24">2025-02-04</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、yaml文件简介"><a href="#一、yaml文件简介" class="headerlink" title="一、yaml文件简介"></a>一、yaml文件简介</h2><blockquote>
+<p>Kubernetes只支持<strong>YAML</strong>和<strong>JSON</strong>格式创建资源对象，<strong>JSON格式用于接口之间消息的传递，适用于开发</strong>；<strong>YAML格式用于配置和管理</strong>，适用于云平台管理，YAML是一种简洁的非标记性语言。</p>
+</blockquote>
+<h3 id="1）yaml的语法规则："><a href="#1）yaml的语法规则：" class="headerlink" title="1）yaml的语法规则："></a>1）yaml的语法规则：</h3><ul>
+<li>大小写敏感</li>
+<li>使用缩进表示层级关系</li>
+<li>缩进时不允许使用Tal键，只允许使用空格</li>
+<li>缩进的空格数目不重要，只要相同层级的元素左侧对齐即可</li>
+<li>”#” 表示注释，从这个字符一直到行尾，都会被解析器忽略</li>
+<li>注：- - - 为可选的分隔符 ，当需要在一个文件中定义多个结构的时候需要使用</li>
+</ul>
+<h3 id="2）在Kubernetes中，只需要知道两种结构类型即可："><a href="#2）在Kubernetes中，只需要知道两种结构类型即可：" class="headerlink" title="2）在Kubernetes中，只需要知道两种结构类型即可："></a>2）在Kubernetes中，只需要知道两种结构类型即可：</h3><ul>
+<li>Lists</li>
+<li>Maps</li>
+</ul>
+<p>2.1）YAML Maps <strong>Map顾名思义指的是字典</strong>，即一个Key:Value 的键值对信息。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述内容表示有两个键apiVersion和kind，分别对应的值为v1和Pod。</p>
+</blockquote>
+<p>Maps的value既能够对应字符串也能够对应一个Maps。例如：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">kube100-site</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">web</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注：上述的YAML文件中，metadata这个KEY对应的值为一个Maps，而嵌套的labels这个KEY的值又是一个Map。实际使用中可视情况进行多层嵌套。</p>
+</blockquote>
+<blockquote>
+<p>YAML处理器根据行缩进来知道内容之间的关联。上述例子中，<strong>使用两个空格作为缩进，但空格的数据量并不重要</strong>，只是至少要求一个空格并且所有缩进保持一致的空格数 。例如，name和labels是相同缩进级别，因此YAML处理器知道他们属于同一map；它知道app是lables的值因为app的缩进更大。</p>
+</blockquote>
+<p>2.2）YAML Lists List即列表，说白了就是数组，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">args</span><br><span class="line"> -beijing</span><br><span class="line"> -shanghai</span><br><span class="line"> -shenzhen</span><br><span class="line"> -guangzhou</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可以指定任何数量的项在列表中，每个项的定义以破折号（-）开头，并且与父元素之间存在缩进。</p>
+</blockquote>
+<p>当然Lists的子项也可以是Maps，Maps的子项也可以是List，例如：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">kube100-site</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">web</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">front-end</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">nginx</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">flaskapp-demo</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">jcdemo/flaskapp</span></span><br><span class="line">      <span class="attr">ports:</span> <span class="number">8080</span></span><br></pre></td></tr></table></figure>
+
+<p>如上述文件所示，定义一个containers的List对象，每个子项都由name、image、ports组成，每个ports都有一个KEY为containerPort的Map组成。</p>
+<h2 id="二、yaml常见语法"><a href="#二、yaml常见语法" class="headerlink" title="二、yaml常见语法"></a>二、yaml常见语法</h2><h3 id="1）apiVersion"><a href="#1）apiVersion" class="headerlink" title="1）apiVersion"></a>1）apiVersion</h3><p>查看当前所有可用的API版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl api-versions</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cada5f3176dd4b7ca420c51cb9f7de8b~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp" alt="img"></p>
+<blockquote>
+<p>1.6版本之前 apiVsersion：extensions&#x2F;v1beta1 1.6版本到1.9版本之间：apps&#x2F;v1beta1 1.9版本之后:apps&#x2F;v1</p>
+</blockquote>
+<p><strong>常用apiversion</strong></p>
+<p>只要记住6个常用的apiversion一般就够用了。</p>
+<ul>
+<li><strong>v1</strong>： Kubernetes API的稳定版本，包含很多核心对象：pod、service等。</li>
+<li><strong>apps&#x2F;v1</strong>： 包含一些通用的应用层的api组合，如：Deployments, RollingUpdates, and ReplicaSets。</li>
+<li><strong>batch&#x2F;v1</strong>： 包含与批处理和类似作业的任务相关的对象，如：job、cronjob。</li>
+<li><strong>autoscaling&#x2F;v1</strong>： 允许根据不同的资源使用指标自动调整容器。</li>
+<li><strong>networking.k8s.io&#x2F;v1</strong>： 用于Ingress。</li>
+<li><strong>rbac.authorization.k8s.io&#x2F;v1</strong>：用于RBAC。</li>
+</ul>
+<h3 id="2）kind"><a href="#2）kind" class="headerlink" title="2）kind"></a>2）kind</h3><blockquote>
+<p>kind指定这个资源对象的类型，如 pod、deployment、statefulset、job、cronjob</p>
+</blockquote>
+<h3 id="3）metadata"><a href="#3）metadata" class="headerlink" title="3）metadata"></a>3）metadata</h3><blockquote>
+<p>metadata常用的配置项有 name,namespace,即配置其显示的名字与归属的命名空间。</p>
+</blockquote>
+<h3 id="4）spec"><a href="#4）spec" class="headerlink" title="4）spec"></a>4）spec</h3><blockquote>
+<p>一个嵌套字典与列表的配置项，也是主要的配置项，支持的子项非常多，根据资源对象的不同，子项会有不同的配置。</p>
+</blockquote>
+<p>如一个pod的spec配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span> <span class="comment">#必选，版本号，例如v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span> <span class="comment">#必选，Pod </span></span><br><span class="line"><span class="attr">metadata:</span> <span class="comment">#必选，元数据 </span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx</span> <span class="comment">#必选，Pod名称 </span></span><br><span class="line">  <span class="attr">labels:</span> <span class="comment">#自定义标签 </span></span><br><span class="line">     <span class="attr">app:</span> <span class="string">nginx</span> <span class="comment">#自定义标签名字 </span></span><br><span class="line"><span class="attr">spec:</span> <span class="comment">#必选，Pod中容器的详细定义 </span></span><br><span class="line">     <span class="attr">containers:</span> <span class="comment">#必选，Pod中容器列表，一个pod里会有多个容器 </span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span> <span class="comment">#必选，容器名称 </span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">nginx</span> <span class="comment">#必选，容器的镜像名称 </span></span><br><span class="line">          <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span> <span class="comment"># [Always | Never | IfNotPresent] #获取镜像的策略 Alawys表示下载镜像 IfnotPresent表示优先使用本地镜像，否则下载镜像，Nerver表示仅使用本地镜像 </span></span><br><span class="line">          <span class="attr">ports:</span> <span class="comment">#需要暴露的端口库号列表 </span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span> <span class="comment">#容器需要监听的端口号 </span></span><br><span class="line">     <span class="attr">restartPolicy:</span> <span class="string">Always</span> <span class="comment"># [Always | Never | OnFailure]#Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Nerver表示不再重启该Pod </span></span><br></pre></td></tr></table></figure>
+
+<p>一个service 的 spec 的配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">service-hello</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">service-hello</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">NodePort</span>      <span class="comment">#这里代表是NodePort类型的,另外还有ingress,LoadBalancer</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">port:</span> <span class="number">80</span>          <span class="comment">#这里的端口和clusterIP(kubectl describe service service-hello中的IP的port)对应，即在集群中所有机器上curl 10.98.166.242:80可访问发布的应用服务。</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">8080</span>  <span class="comment">#端口一定要和container暴露出来的端口对应，nodejs暴露出来的端口是8081，所以这里也应是8081</span></span><br><span class="line">    <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">    <span class="attr">nodePort:</span> <span class="number">31111</span>   <span class="comment"># 所有的节点都会开放此端口30000--32767，此端口供外部调用。</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">run:</span> <span class="string">hello</span>         <span class="comment">#这里选择器一定要选择容器的标签，之前写name:kube-node是错的。</span></span><br></pre></td></tr></table></figure>
+
+<p>这里是将nginx映射到外网，访问地址就是本机ip:31111</p>
+<h2 id="三、port详解"><a href="#三、port详解" class="headerlink" title="三、port详解"></a>三、port详解</h2><ul>
+<li><strong>port</strong>：port是k8s集群<strong>内部访问service的端口</strong>，即通过clusterIP: port可以访问到某个service</li>
+<li><strong>nodePort</strong>：nodePort是<strong>外部访问k8s集群中service的端口</strong>，通过nodeIP: nodePort可以从外部访问到某个service。</li>
+<li><strong>targetPort</strong>：targetPort是<strong>pod的端口</strong>，从port和nodePort来的流量经过kube-proxy流入到后端pod的targetPort上，最后进入容器。</li>
+<li><strong>containerPort</strong>：containerPort是<strong>pod内部容器的端口</strong>，targetPort映射到containerPort。</li>
+</ul>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ad72b8c3b37f4b87a19382d76d35d51c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp" alt="img"></p>
+<h2 id="四、yaml简单示例"><a href="#四、yaml简单示例" class="headerlink" title="四、yaml简单示例"></a>四、yaml简单示例</h2><p>接下来就是看看deployment、pod、service 这三种资源的说明书例子</p>
+<h3 id="1）deployment"><a href="#1）deployment" class="headerlink" title="1）deployment"></a>1）deployment</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span>   <span class="comment"># 1.9.0 之前的版本使用 apps/v1beta2，可通过命令 kubectl api-versions 查看</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span>    <span class="comment">#指定创建资源的角色/类型</span></span><br><span class="line"><span class="attr">metadata:</span>    <span class="comment">#资源的元数据/属性</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-deployment</span>    <span class="comment">#资源的名字，在同一个namespace中必须唯一</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">2</span>    <span class="comment">#副本数量2</span></span><br><span class="line">  <span class="attr">selector:</span>      <span class="comment">#定义标签选择器</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">web-server</span></span><br><span class="line">  <span class="attr">template:</span>      <span class="comment">#这里Pod的定义</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span>    <span class="comment">#Pod的label</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">web-server</span></span><br><span class="line">    <span class="attr">spec:</span>        <span class="comment"># 指定该资源的内容  </span></span><br><span class="line">      <span class="attr">containers:</span>  </span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span>      <span class="comment">#容器的名字  </span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">nginx:1.12.1</span>  <span class="comment">#容器的镜像地址    </span></span><br><span class="line">        <span class="attr">ports:</span>  </span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span>  <span class="comment">#容器对外的端口</span></span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令创建 deployment 资源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f nginx.yaml</span><br></pre></td></tr></table></figure>
+
+<h3 id="2）pod"><a href="#2）pod" class="headerlink" title="2）pod"></a>2）pod</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span>  </span><br><span class="line"><span class="attr">metadata:</span>  </span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-redis</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">redis</span></span><br><span class="line"><span class="attr">spec:</span> </span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">pod-redis</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">docker.io/redis</span>  </span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span> <span class="comment">#容器对外的端口</span></span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令创建 pod 资源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f pod-redis.yaml</span><br></pre></td></tr></table></figure>
+
+<h3 id="3）service"><a href="#3）service" class="headerlink" title="3）service"></a>3）service</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span>  </span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span>  <span class="comment"># 指明资源类型是 service</span></span><br><span class="line"><span class="attr">metadata:</span>  </span><br><span class="line">  <span class="attr">name:</span> <span class="string">httpd-svc</span> <span class="comment"># service 的名字是 httpd-svc</span></span><br><span class="line">  <span class="attr">labels:</span>  </span><br><span class="line">    <span class="attr">name:</span> <span class="string">httpd-svc</span> </span><br><span class="line"><span class="attr">spec:</span>  </span><br><span class="line">  <span class="attr">ports:</span>  <span class="comment"># 将 service 8080 端口映射到 pod 的 80 端口，使用 TCP 协议</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">80</span>  </span><br><span class="line">    <span class="attr">protocol:</span> <span class="string">TCP</span>  </span><br><span class="line">  <span class="attr">selector:</span>  </span><br><span class="line">    <span class="attr">run:</span> <span class="string">httpd</span> <span class="comment"># 指明哪些 label 的 pod 作为 service 的后端</span></span><br></pre></td></tr></table></figure>
+
+<p>执行以下命令创建 service 资源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl create -f httpd-svc.yaml</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、Label与Selector"><a href="#五、Label与Selector" class="headerlink" title="五、Label与Selector"></a>五、Label与Selector</h2><h3 id="1）Label"><a href="#1）Label" class="headerlink" title="1）Label"></a>1）Label</h3><blockquote>
+<p>Label是Kubernetes系列中另外一个核心概念。<strong>是一组绑定到K8s资源对象上的key&#x2F;value对</strong>。同一个对象的labels属性的key必须唯一。label可以附加到各种资源对象上，如Node,Pod,Service,RC等。</p>
+</blockquote>
+<blockquote>
+<p>通过给指定的资源对象捆绑一个或多个不用的label来实现多维度的资源分组管理功能，以便于灵活，方便地进行资源分配，调度，配置，部署等管理工作。</p>
+</blockquote>
+<p>示例如下：</p>
+<ul>
+<li>版本标签：”release” : “stable” , “release” : “canary”…</li>
+<li>环境标签：”environment” : “dev” , “environment” : “production”</li>
+<li>架构标签：”tier” : “frontend” , “tier” : “backend” , “tier” : “middleware”</li>
+<li>分区标签：”partition” : “customerA” , “partition” : “customerB”…</li>
+<li>质量管控标签：”track” : “daily” , “track” : “weekly”</li>
+</ul>
+<h3 id="2）Selector"><a href="#2）Selector" class="headerlink" title="2）Selector"></a>2）Selector</h3><blockquote>
+<p>Label selector是Kubernetes核心的分组机制，通过label selector客户端&#x2F;用户能够识别一组有共同特征或属性的资源对象。符合这个标签的 Pod 会作为这个 Service 的 backend。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">hello</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">hello</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">port:</span> <span class="number">80</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">80</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">hello</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="六、kubectl-create还是-kubectl-replace二者区别"><a href="#六、kubectl-create还是-kubectl-replace二者区别" class="headerlink" title="六、kubectl create还是 kubectl replace二者区别"></a>六、kubectl create还是 kubectl replace二者区别</h2><blockquote>
+<p>kubectl create -f 还是 kubectl replace -f 都可以创建资源，但是有什么区别呢，请细品下面讲解。</p>
+</blockquote>
+<p>kubectl create：</p>
+<ul>
+<li>kubectl create命令可创建新资源。 因此，如果<strong>再次运行该命令，则会抛出错误</strong>，因为资源名称在名称空间中应该是唯一的。</li>
+</ul>
+<p>kubectl apply：</p>
+<ul>
+<li>kubectl apply命令将配置应用于资源。 如果资源不在那里，那么它将被创建。 <strong>kubectl apply命令可以多次运行</strong>，因为它只是应用如下所示的配置。 在这种情况下，配置没有改变。 所以，pod没有改变。</li>
+<li>简单来说，如果在单个文件上运行操作以<strong>创建资源，则create和apply基本相同</strong>。 但是， apply允许您在目录下的多个文件上同时创建和修补。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">igl1t</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/">http://example.com/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">igl1t's blog</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/02/04/SingleFlight/" title="SingleFlight"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">SingleFlight</div></div><div class="info-2"><div class="info-item-1">SingleFlight为什么我们需要 SingleFlight（使用场景）？一般情况下我们在写一写对外的服务的时候都会有一层 cache 作为缓存，用来减少底层数据库的压力，但是在遇到例如 redis 抖动或者其他情况可能会导致大量的 cache miss 出现。 如下图所示，可能存在来自桌面端和移动端的用户有 1000 的并发请求，他们都访问的获取文章列表的接口，获取前 20 条信息，如果这个时候我们服务直接去访问 redis 出现 cache miss 那么我们就会去请求 1000 次数据库，这时可能会给数据库带来较大的压力（这里的 1000 只是一个例子，实际上可能远大于这个值）导致我们的服务异常或者超时。这时候就可以使用 singleflight 库了，直译过来就是单飞，这个库的主要作用就是将一组相同的请求合并成一个请求，实际上只会去请求一次，然后对所有的请求返回相同的结果。如下图所示，使用 singleflight 之后，我们在一个请求的时间周期内实际上只会向底层的数据库发起一次请求大大减少对数据库的压力。 SingleFlight...</div></div></div></a><a class="pagination-related" href="/2025/02/04/channel/" title="channel使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">channel使用</div></div><div class="info-2"><div class="info-item-1">介绍 Go语⾔中，不要通过共享内存来通信，⽽要通过通信来实现内存共享。Go的 CSP(Communicating Sequential Process)并发模型，中⽂可以叫做通信顺序进程，是通过 goroutine 和 channel 来实现的。所以 channel 收发遵循先进先出 FIFO，分为有缓存和⽆缓存，channel 中⼤致有 buffer(当缓冲区⼤⼩部位0 时， 是个 ring buffer)、sendx 和 recvx 收发的位置(ring buffer 记录实现)、sendq、recvq 当前 channel 因为缓冲区不⾜⽽阻塞的队列、使⽤双向链表存储、还有⼀个 mutex 锁控制并发、其他原属等。 向channel写入数据和从channel里面读数据都是原子性的，所以channel是并发安全的。  channel的特性 给⼀个 nil channel 发送数据，造成永远阻塞  从⼀个 nil channel 接收数据，造成永远阻塞  给⼀个已经关闭的 channel 发送数据，引起 panic  从⼀个已经关闭的 channel...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">igl1t</div><div class="author-info-description">某不知名黑客</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81yaml%E6%96%87%E4%BB%B6%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">一、yaml文件简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89yaml%E7%9A%84%E8%AF%AD%E6%B3%95%E8%A7%84%E5%88%99%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">1）yaml的语法规则：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89%E5%9C%A8Kubernetes%E4%B8%AD%EF%BC%8C%E5%8F%AA%E9%9C%80%E8%A6%81%E7%9F%A5%E9%81%93%E4%B8%A4%E7%A7%8D%E7%BB%93%E6%9E%84%E7%B1%BB%E5%9E%8B%E5%8D%B3%E5%8F%AF%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">2）在Kubernetes中，只需要知道两种结构类型即可：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81yaml%E5%B8%B8%E8%A7%81%E8%AF%AD%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">二、yaml常见语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89apiVersion"><span class="toc-number">2.1.</span> <span class="toc-text">1）apiVersion</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89kind"><span class="toc-number">2.2.</span> <span class="toc-text">2）kind</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%EF%BC%89metadata"><span class="toc-number">2.3.</span> <span class="toc-text">3）metadata</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%EF%BC%89spec"><span class="toc-number">2.4.</span> <span class="toc-text">4）spec</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81port%E8%AF%A6%E8%A7%A3"><span class="toc-number">3.</span> <span class="toc-text">三、port详解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81yaml%E7%AE%80%E5%8D%95%E7%A4%BA%E4%BE%8B"><span class="toc-number">4.</span> <span class="toc-text">四、yaml简单示例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89deployment"><span class="toc-number">4.1.</span> <span class="toc-text">1）deployment</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89pod"><span class="toc-number">4.2.</span> <span class="toc-text">2）pod</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%EF%BC%89service"><span class="toc-number">4.3.</span> <span class="toc-text">3）service</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81Label%E4%B8%8ESelector"><span class="toc-number">5.</span> <span class="toc-text">五、Label与Selector</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89Label"><span class="toc-number">5.1.</span> <span class="toc-text">1）Label</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89Selector"><span class="toc-number">5.2.</span> <span class="toc-text">2）Selector</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81kubectl-create%E8%BF%98%E6%98%AF-kubectl-replace%E4%BA%8C%E8%80%85%E5%8C%BA%E5%88%AB"><span class="toc-number">6.</span> <span class="toc-text">六、kubectl create还是 kubectl replace二者区别</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/channel/" title="channel使用">channel使用</a><time datetime="2025-02-04T12:52:00.038Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/yaml%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" title="yaml文件详解">yaml文件详解</a><time datetime="2025-02-04T12:52:00.035Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/SingleFlight/" title="SingleFlight">SingleFlight</a><time datetime="2025-02-04T12:52:00.034Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/vim%E6%89%93%E9%80%A0%E6%88%90idea/" title="vim打造成ide">vim打造成ide</a><time datetime="2025-02-04T12:52:00.033Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/02/04/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/" title="io 多路复用">io 多路复用</a><time datetime="2025-02-04T12:52:00.031Z" title="发表于 2025-02-04 20:52:00">2025-02-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By igl1t</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
